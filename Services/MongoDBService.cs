@@ -26,18 +26,25 @@ public class MongoDBService
         ConnectionString = $"mongodb+srv://{databaseUser}:{databasePassword}@datacluster.kcry9.mongodb.net/?retryWrites=true&w=majority&appName=dataCluster";
     }
 
+    public void SetUser(string databaseUser, string databasePassword)
+    {
+        DatabaseUser = databaseUser;
+        DatabasePassword = databasePassword;
+        ConnectionString = $"mongodb+srv://{databaseUser}:{databasePassword}@datacluster.kcry9.mongodb.net/?retryWrites=true&w=majority&appName=dataCluster";
+    }
+
     public bool Connect()
     {
-        try
-        {
+        try {
             Client = new MongoClient(ConnectionString);
             Database = Client.GetDatabase(DatabaseName);
             Collection = Database.GetCollection<PersonModel>(CollectionName);
+            Console.WriteLine("Pinging your deployment...");
+            var result = Client.GetDatabase("admin").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
+            Console.WriteLine($"Pinged your deployment. You successfully connected to MongoDB! {result}");
             return true;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
+        } catch (Exception ex) {
+            Console.WriteLine("Could not connect to MongoDB.");
             return false;
         }
     }

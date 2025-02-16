@@ -3,5 +3,60 @@ using Inpost_org.Users;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-Console.WriteLine("Hello World!");
-Console.ReadKey();
+internal class Program
+{
+    public static string GetInputString(string prompt)
+    {
+        string input;
+        Console.WriteLine(prompt);
+        input = Console.ReadLine();
+        return input;
+    }
+    
+    public static int GetInputInt(string prompt)
+    {
+        int input;
+        Console.WriteLine(prompt);
+        while (!int.TryParse(Console.ReadLine(), out input) && input < 0 && input > 6)
+        {
+            Console.WriteLine("Invalid input. Please enter a number:");
+        }
+        return input;
+    }
+    
+    public static void ShowMenu()
+    {
+        
+    }
+    
+    public static void Main(string[] args)
+    {
+        PersonModel person = new("admin", "admin");
+        person.AddRole(Role.Administrator);
+        
+        string username = GetInputString("Enter database user:");
+        string passphrase = GetInputString("Enter database user passphrase:");
+        MongoDBService mongo = new MongoDBService(username, passphrase);
+        while (!mongo.Connect())
+        {
+            Console.WriteLine("Connection failed. Try again.");
+            username = GetInputString("Enter database user:");
+            passphrase = GetInputString("Enter database user passphrase:");
+            mongo.SetUser(username, passphrase);
+            Console.WriteLine("\n");
+        }
+        Console.WriteLine("Connection successful.");
+        System.Threading.Thread.Sleep(2000);
+        Console.Clear();
+        
+        MongoDBOperationHandler mongoOperation = new MongoDBOperationHandler(new AddUserOperation().Operation);
+        mongoOperation += new MongoDBOperationHandler(new ShowUserOperation().Operation);
+        mongoOperation += new MongoDBOperationHandler(new DeleteUserOperation().Operation);
+        
+        mongoOperation.GetInvocationList()[0].DynamicInvoke(mongo, person);
+        mongoOperation.GetInvocationList()[1].DynamicInvoke(mongo, person);
+        mongoOperation.GetInvocationList()[2].DynamicInvoke(mongo, person);
+
+        ShowMenu();
+    }
+}
