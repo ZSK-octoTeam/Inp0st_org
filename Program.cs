@@ -88,10 +88,27 @@ internal class Program
         MongoDBService mongo = ConnectToDatabase();
         PassphraseMenager.mongo = mongo;
         
+        PassphraseMenager.PassphraseVerified += (username, verified) =>
+        {
+            if (verified)
+            {
+                Console.WriteLine("User verified.");
+            }
+            else
+            {
+                Console.WriteLine("User not verified.");
+            }
+        };
+        
         MongoDBOperationHandler mongoOperation = null; 
         mongoOperation += new MongoDBOperationHandler(new AddUserOperation().Operation);
         mongoOperation += new MongoDBOperationHandler(new ShowUserOperation().Operation);
         mongoOperation += new MongoDBOperationHandler(new DeleteUserOperation().Operation);
+
+        
+        PersonModel person = new PersonModel("adminUser", "sigma");
+        person.AddRole(Role.Administrator);
+        mongoOperation.GetInvocationList()[0].DynamicInvoke(mongo, person);
         
         ShowMenu();
     }

@@ -8,8 +8,16 @@ public class AddUserOperation : CRUD
 {
     public void Operation(MongoDBService mongo, PersonModel person)
     {
-        mongo.Collection.InsertOne(person);
-        Console.WriteLine("User added.");
+        if (!PassphraseMenager.VerifyPassword(person))
+        {
+            //person.Password = PassphraseMenager.HashPassword(person.Password);
+            //mongo.Collection.InsertOne(person);
+            Console.WriteLine("User added.");
+        }
+        else
+        {
+            Console.WriteLine("User already exists.");
+        }
     }
 }
 
