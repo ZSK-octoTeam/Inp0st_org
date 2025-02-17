@@ -1,5 +1,6 @@
 ﻿using Inpost_org.Services;
 using Inpost_org.Users;
+using Inpost_org.Users.Deliveries;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
@@ -24,12 +25,34 @@ internal class Program
         return input;
     }
     
-    public static void LogIn()
+    public static void LogIn(MongoDBService mongo)
     {
-        string username = GetInputString("Enter your username:");
-        string password = GetInputString("Enter your password:");
+        while (true)
+        {
+            string username = GetInputString("Enter your username:");
+            string password = GetInputString("Enter your password:");
         
-        //check if user exists in database
+            PersonModel person = new PersonModel(username, password);
+        
+            foreach (var databasePerson in mongo.Collection.Find(new BsonDocument()).ToList())
+            {
+                if (databasePerson.Username == person.Username)
+                {
+                    if(PassphraseMenager.HashPassword(person.Password) == databasePerson.Password)
+                    {
+                        Console.WriteLine("Log in successful.");
+                        ShowMenu();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Log in failed. Wrong password.");
+                        LogIn(mongo);
+                    }
+                
+                }
+            }
+            Console.WriteLine("Log in failed. User not found.");
+        }
     }
     
     public static MongoDBService ConnectToDatabase()
@@ -78,7 +101,7 @@ internal class Program
                 //LogOut();
                 break;
             case 5:
-                //Exit();
+                Environment.Exit(0);
                 break;
         }
     }
@@ -87,29 +110,18 @@ internal class Program
     {
         MongoDBService mongo = ConnectToDatabase();
         PassphraseMenager.mongo = mongo;
-        
+
         PassphraseMenager.PassphraseVerified += (username, verified) =>
-        {
-            if (verified)
-            {
-                Console.WriteLine("User verified.");
-            }
-            else
-            {
-                Console.WriteLine("User not verified.");
-            }
-        };
+        Console.WriteLine( verified ?$"User: {username} found." : $"User {username} not found.");
         
         MongoDBOperationHandler mongoOperation = null; 
         mongoOperation += new MongoDBOperationHandler(new AddUserOperation().Operation);
         mongoOperation += new MongoDBOperationHandler(new ShowUserOperation().Operation);
         mongoOperation += new MongoDBOperationHandler(new DeleteUserOperation().Operation);
 
-        
-        PersonModel person = new PersonModel("adminUser", "sigma");
-        person.AddRole(Role.Administrator);
-        mongoOperation.GetInvocationList()[0].DynamicInvoke(mongo, person);
-        
+        LogIn(mongo);
+        ParcelModel parcel = new ParcelModel("paczka", new PersonModel("username", "password"), new PersonModel("username", "password"));
+        mongo.CollectionParcels.InsertOne(parcel);
         ShowMenu();
     }
 }

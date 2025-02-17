@@ -11,7 +11,7 @@ public class PassphraseMenager
     public static MongoDBService mongo;
     public static event Action<string, bool> PassphraseVerified;
 
-    public static bool VerifyPassword(PersonModel person)
+    public static bool VerifyUser(PersonModel person)
     {
         foreach (var databasePerson in mongo.Collection.Find(new BsonDocument()).ToList())
         {
