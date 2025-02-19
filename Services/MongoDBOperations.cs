@@ -8,7 +8,7 @@ public class AddUserOperation : CRUD
 {
     public void Operation(MongoDBService mongo, PersonModel person)
     {
-        //mongo.Collection.InsertOne(person);
+        mongo.Collection.InsertOne(person);
         Console.WriteLine("User added.");
     }
 }
