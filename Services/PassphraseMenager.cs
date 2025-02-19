@@ -1,24 +1,27 @@
 using System.Security.Cryptography;
 using System.Text;
 using Inpost_org.Users;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Inpost_org.Services;
 
 public class PassphraseMenager
 {
-    public static MongoDBService mongo { get; set; }
-    public static event Action<string, bool> PasswordVerified;
+    public static MongoDBService mongo;
+    public static event Action<string, bool> PassphraseVerified;
 
-    public static bool VerifyPassword(string username, string password, PersonModel person)
+    public static bool VerifyUser(PersonModel person)
     {
-        string hashedPassword = HashPassword(password);
-        if (person.Username == username && person.Password == hashedPassword)
+        foreach (var databasePerson in mongo.Collection.Find(new BsonDocument()).ToList())
         {
-            PasswordVerified?.Invoke(username, true);
-            return true;
+            if (databasePerson.Username == person.Username)
+            {
+                PassphraseVerified?.Invoke(person.Username, true);
+                return true;
+            }
         }
-        PasswordVerified?.Invoke(username, false);
+        PassphraseVerified?.Invoke(person.Username, false);
         return false;
     }
 
