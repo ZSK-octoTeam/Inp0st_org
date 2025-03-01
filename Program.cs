@@ -1,4 +1,5 @@
 ﻿using Inpost_org.Services;
+using Inpost_org.Services.Operations;
 using Inpost_org.Users;
 using Inpost_org.Users.Deliveries;
 using MongoDB.Driver;
@@ -107,9 +108,21 @@ internal class Program
     
     public static void Main(string[] args)
     {
+        // Database
         MongoDBService mongo = ConnectToDatabase();
         PassphraseMenager.mongo = mongo;
         
+        // Operations
+        AddUserOperation addUserOperation = new AddUserOperation();
+        addUserOperation.Notify += EventListener.OnOperation;
+        ShowUserOperation showUserOperation = new ShowUserOperation();
+        showUserOperation.Notify += EventListener.OnOperation;
+        UpdateUserOperation updateUserOperation = new UpdateUserOperation();
+        updateUserOperation.Notify += EventListener.OnOperation;
+        DeleteUserOperation deleteUserOperation = new DeleteUserOperation();
+        deleteUserOperation.Notify += EventListener.OnOperation;
+        
+        // Log in and show menu
         LogIn(mongo);
         ShowMenu();
     }
