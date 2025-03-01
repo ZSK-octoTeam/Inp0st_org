@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+
 namespace Inpost_org.Users.Deliveries;
 
 public enum ParcelStatus
@@ -25,5 +26,10 @@ public class ParcelModel
         Sender = sender;
         Recipient = recipient;
         Status = ParcelStatus.InWarehouse;
+    }
+    
+    public void ChangeStatus(ParcelStatus newStatus)
+    {
+        Status = newStatus;
     }
 }

@@ -34,7 +34,7 @@ internal class Program
         
             PersonModel person = new PersonModel(username, password);
         
-            foreach (var databasePerson in mongo.Collection.Find(new BsonDocument()).ToList())
+            foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
             {
                 if (databasePerson.Username == person.Username)
                 {
@@ -72,7 +72,6 @@ internal class Program
         
         Console.WriteLine("Connection successful.");
         return mongo;
-        System.Threading.Thread.Sleep(2000);
     }
     
     public static void ShowMenu()
@@ -110,18 +109,8 @@ internal class Program
     {
         MongoDBService mongo = ConnectToDatabase();
         PassphraseMenager.mongo = mongo;
-
-        PassphraseMenager.PassphraseVerified += (username, verified) =>
-        Console.WriteLine( verified ?$"User: {username} found." : $"User {username} not found.");
         
-        MongoDBOperationHandler mongoOperation = null; 
-        mongoOperation += new MongoDBOperationHandler(new AddUserOperation().Operation);
-        mongoOperation += new MongoDBOperationHandler(new ShowUserOperation().Operation);
-        mongoOperation += new MongoDBOperationHandler(new DeleteUserOperation().Operation);
-
         LogIn(mongo);
-        ParcelModel parcel = new ParcelModel("paczka", new PersonModel("username", "password"), new PersonModel("username", "password"));
-        mongo.CollectionParcels.InsertOne(parcel);
         ShowMenu();
     }
 }

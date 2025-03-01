@@ -9,22 +9,29 @@ namespace Inpost_org.Services;
 public class PassphraseMenager
 {
     public static MongoDBService mongo;
-    public static event Action<string, bool> PassphraseVerified;
 
+    /// <summary>
+    /// Check if the user is in the database
+    /// </summary>
+    /// <param name="person"></param>
+    /// <returns>true if there is a person with the same username in database</returns>
     public static bool VerifyUser(PersonModel person)
     {
-        foreach (var databasePerson in mongo.Collection.Find(new BsonDocument()).ToList())
+        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
         {
             if (databasePerson.Username == person.Username)
             {
-                PassphraseVerified?.Invoke(person.Username, true);
                 return true;
             }
         }
-        PassphraseVerified?.Invoke(person.Username, false);
         return false;
     }
 
+    /// <summary>
+    /// function for hashing passwords
+    /// </summary>
+    /// <param name="password"></param>
+    /// <returns>hashed password</returns>
     public static string HashPassword(string password)
     {
         using (var sha256 = SHA256.Create())
