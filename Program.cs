@@ -29,7 +29,7 @@ internal class Program
         return input;
     }
     
-    public static void LogIn(MongoDBService mango)
+    public static void LogIn(MongoDBService mongo)
     {
             string username = GetInputString("Enter your username:");
             string password = GetInputString("Enter your password:");
@@ -48,13 +48,13 @@ internal class Program
                     else
                     {
                         Console.WriteLine("Log in failed. Wrong password.");
-                        LogIn(mango);
+                        LogIn(mongo);
                     }
                 
                 }
             }
             Console.WriteLine("Log in failed. User not found.");
-            LogIn(mango);
+            LogIn(mongo);
     }
     
     public static MongoDBService ConnectToDatabase()
@@ -62,14 +62,14 @@ internal class Program
         string username = GetInputString("Enter database user:");
         string passphrase = GetInputString("Enter database user passphrase:");
         
-        MongoDBService mango = new MongoDBService(username, passphrase);
+        MongoDBService mongo = new MongoDBService(username, passphrase);
         
-        while (!mango.Connect())
+        while (!mongo.Connect())
         {
             Console.WriteLine("Connection failed. Try again.");
             username = GetInputString("Enter database user:");
             passphrase = GetInputString("Enter database user passphrase:");
-            mango.SetUser(username, passphrase);
+            mongo.SetUser(username, passphrase);
         }
         
         Console.WriteLine("Connection successful.");
@@ -102,7 +102,7 @@ internal class Program
                 case 4:
                     Console.Clear();
                     Console.WriteLine($"Logged out successfully.");
-                    LogIn(PassphraseMenager.mango);
+                    LogIn(PassphraseMenager.mongo);
                     break;
                 case 5:
                     Environment.Exit(0);
