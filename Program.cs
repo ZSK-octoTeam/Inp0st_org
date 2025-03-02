@@ -1,5 +1,7 @@
 ﻿using Inpost_org.Services;
+using Inpost_org.Services.Operations;
 using Inpost_org.Users;
+using Inpost_org.Users.Deliveries;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
@@ -24,6 +26,36 @@ internal class Program
         return input;
     }
     
+    public static void LogIn(MongoDBService mongo)
+    {
+        while (true)
+        {
+            string username = GetInputString("Enter your username:");
+            string password = GetInputString("Enter your password:");
+        
+            PersonModel person = new PersonModel(username, password);
+        
+            foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
+            {
+                if (databasePerson.Username == person.Username)
+                {
+                    if(PassphraseMenager.HashPassword(person.Password) == databasePerson.Password)
+                    {
+                        Console.WriteLine("Log in successful.");
+                        ShowMenu();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Log in failed. Wrong password.");
+                        LogIn(mongo);
+                    }
+                
+                }
+            }
+            Console.WriteLine("Log in failed. User not found.");
+        }
+    }
+    
     public static MongoDBService ConnectToDatabase()
     {
         string username = GetInputString("Enter database user:");
@@ -41,27 +73,57 @@ internal class Program
         
         Console.WriteLine("Connection successful.");
         return mongo;
-        System.Threading.Thread.Sleep(2000);
     }
     
     public static void ShowMenu()
     {
+        Console.WriteLine("=== MENU ===\n");
+        Console.WriteLine("1. Menage clients");
+        Console.WriteLine("2. Menage deliverers");
+        Console.WriteLine("3. Menage packages");
+        Console.WriteLine("4. Log out");
+        Console.WriteLine("5. Exit");
         
+        int choice = GetInputInt("Enter your choice:");
+
+        switch (choice)
+        {
+            case 1:
+                //MenageClients();
+                break;
+            case 2:
+                //MenageDeliverers();
+                break;
+            case 3:
+                //MenagePackages();
+                break;
+            case 4:
+                //LogOut();
+                break;
+            case 5:
+                Environment.Exit(0);
+                break;
+        }
     }
     
     public static void Main(string[] args)
     {
+        // Database
         MongoDBService mongo = ConnectToDatabase();
-
-        /*MongoDBOperationHandler mongoOperation = null; 
-        mongoOperation += new MongoDBOperationHandler(new AddUserOperation().Operation);
-        mongoOperation += new MongoDBOperationHandler(new ShowUserOperation().Operation);
-        mongoOperation += new MongoDBOperationHandler(new DeleteUserOperation().Operation);
+        PassphraseMenager.mongo = mongo;
         
-        mongoOperation.GetInvocationList()[0].DynamicInvoke(mongo, person);
-        mongoOperation.GetInvocationList()[1].DynamicInvoke(mongo, person);
-        mongoOperation.GetInvocationList()[2].DynamicInvoke(mongo, person);*/
-
+        // Operations
+        AddUserOperation addUserOperation = new AddUserOperation();
+        addUserOperation.Notify += EventListener.OnOperation;
+        ShowUserOperation showUserOperation = new ShowUserOperation();
+        showUserOperation.Notify += EventListener.OnOperation;
+        UpdateUserOperation updateUserOperation = new UpdateUserOperation();
+        updateUserOperation.Notify += EventListener.OnOperation;
+        DeleteUserOperation deleteUserOperation = new DeleteUserOperation();
+        deleteUserOperation.Notify += EventListener.OnOperation;
+        
+        // Log in and show menu
+        LogIn(mongo);
         ShowMenu();
     }
 }
