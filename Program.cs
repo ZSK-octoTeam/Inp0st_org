@@ -24,7 +24,7 @@ internal class Program
         Console.WriteLine(prompt);
         while (!int.TryParse(Console.ReadLine(), out input) || input < 1 || input > 5)
         {
-            Console.WriteLine("Invalid input. Please enter a number:");
+            Console.WriteLine("Invalid input. Please enter a correct number:");
         }
         return input;
     }
@@ -79,7 +79,7 @@ internal class Program
     public static void ShowMenu()
     {
         while(true){
-            Console.WriteLine("=== MENU ===\n");
+            Console.WriteLine("=== MENU ===");
             Console.WriteLine("1. Menage clients");
             Console.WriteLine("2. Menage deliverers");
             Console.WriteLine("3. Menage packages");
@@ -114,7 +114,7 @@ internal class Program
     public static void ShowClientsMenu()
     {
         while(true){
-            Console.WriteLine("=== CLIENTS MENU ===\n");
+            Console.WriteLine("=== CLIENTS MENU ===");
             Console.WriteLine("1. Add client");
             Console.WriteLine("2. Show client");
             Console.WriteLine("3. Delete client");
@@ -147,7 +147,7 @@ internal class Program
     public static void ShowDeliverersMenu()
     {
         while(true){
-            Console.WriteLine("=== DELIVERERS MENU ===\n");
+            Console.WriteLine("=== DELIVERERS MENU ===");
             Console.WriteLine("1. Add deliverer");
             Console.WriteLine("2. Show deliverer");
             Console.WriteLine("3. Delete deliverer");
@@ -180,7 +180,7 @@ internal class Program
     public static void ShowPackagesMenu()
     {
         while(true){
-            Console.WriteLine("=== PACKAGES MENU ===\n");
+            Console.WriteLine("=== PACKAGES MENU ===");
             Console.WriteLine("1. Add package");
             Console.WriteLine("2. Show package");
             Console.WriteLine("3. Delete package");
