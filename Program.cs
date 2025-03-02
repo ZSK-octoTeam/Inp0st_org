@@ -1,6 +1,10 @@
-﻿using Inpost_org.Services;
-using Inpost_org.Users;
+﻿using Inpost_org.Services.Operations.ParcelOperations;
+using Inpost_org.Services.Operations.UserOperations;
+using Inpost_org.Services.NotificationMethods;
+using Inpost_org.Services.Operations;
+using Inpost_org.Services;
 using Inpost_org.Users.Deliveries;
+using Inpost_org.Users;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
@@ -32,7 +36,7 @@ internal class Program
         
             PersonModel person = new PersonModel(username, password);
         
-            foreach (var databasePerson in mango.Collection.Find(new BsonDocument()).ToList())
+            foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
             {
                 if (databasePerson.Username == person.Username)
                 {
@@ -69,8 +73,7 @@ internal class Program
         }
         
         Console.WriteLine("Connection successful.");
-        return mango;
-        System.Threading.Thread.Sleep(2000);
+        return mongo;
     }
     
     public static void ShowMenu()
@@ -209,19 +212,21 @@ internal class Program
     
     public static void Main(string[] args)
     {
-        MongoDBService mango = ConnectToDatabase();
-        PassphraseMenager.mango = mango;
-
-        PassphraseMenager.PassphraseVerified += (username, verified) =>
-        Console.WriteLine( verified ?$"User: {username} found." : $"User {username} not found.");
-
-        MongoDBOperationHandler mongoOperation = null; 
-        mongoOperation += new MongoDBOperationHandler(new AddUserOperation().Operation);
-        mongoOperation += new MongoDBOperationHandler(new ShowUserOperation().Operation);
-        mongoOperation += new MongoDBOperationHandler(new DeleteUserOperation().Operation);
-
-        LogIn(mango);
-        //ParcelModel parcel = new ParcelModel("paczka", new PersonModel("username", "password"), new PersonModel("username", "password"));
-        //mango.CollectionParcels.InsertOne(parcel);
+        // Database
+        MongoDBService mongo = ConnectToDatabase();
+        PassphraseMenager.mongo = mongo;
+        
+        // Operations
+        AddUserOperation addUser = new AddUserOperation();
+        addUser.Notify += EventListener.OnUserOperation;
+        ShowUserOperation showUser = new ShowUserOperation();
+        showUser.Notify += EventListener.OnUserOperation;
+        UpdateUserOperation updateUser = new UpdateUserOperation();
+        updateUser.Notify += EventListener.OnUserOperation;
+        DeleteUserOperation deleteUser = new DeleteUserOperation();
+        deleteUser.Notify += EventListener.OnUserOperation;
+        
+        // Log in and show menu
+        LogIn(mongo);
     }
 }
