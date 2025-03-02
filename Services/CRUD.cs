@@ -11,5 +11,5 @@ public interface crudUsers
 
 public interface crudParcels
 {
-    void Operation(MongoDBService mongo, ParcelModel parcel, MongoDBOperationEventArgs e);
+    void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e);
 }

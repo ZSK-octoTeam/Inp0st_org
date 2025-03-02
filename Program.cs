@@ -29,7 +29,7 @@ internal class Program
         return input;
     }
     
-    public static void LogIn(MongoDBService mongo)
+    public static PersonModel LogIn(MongoDBService mongo)
     {
         while (true)
         {
@@ -42,10 +42,10 @@ internal class Program
             {
                 if (databasePerson.Username == person.Username)
                 {
-                    if(PassphraseMenager.HashPassword(person.Password) == databasePerson.Password)
+                    if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Password)
                     {
                         Console.WriteLine("Log in successful.");
-                        ShowMenu();
+                        return person;
                     }
                     else
                     {
@@ -113,7 +113,7 @@ internal class Program
     {
         // Database
         MongoDBService mongo = ConnectToDatabase();
-        PassphraseMenager.mongo = mongo;
+        DatabaseSearch.mongo = mongo;
         
         // Operations
         AddUserOperation addUser = new AddUserOperation();
@@ -126,7 +126,7 @@ internal class Program
         deleteUser.Notify += EventListener.OnUserOperation;
         
         // Log in and show menu
-        //LogIn(mongo);
-        //ShowMenu();
+        PersonModel loggedIn = LogIn(mongo);
+        ShowMenu();
     }
 }
