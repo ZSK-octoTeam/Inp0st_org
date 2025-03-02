@@ -1,7 +1,8 @@
-﻿using Inpost_org.Services;
+﻿using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Services.Operations;
-using Inpost_org.Users;
+using Inpost_org.Services;
 using Inpost_org.Users.Deliveries;
+using Inpost_org.Users;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
@@ -108,22 +109,25 @@ internal class Program
     
     public static void Main(string[] args)
     {
+        PersonModel person = new PersonModel("guc10", "maslo");
         // Database
         MongoDBService mongo = ConnectToDatabase();
         PassphraseMenager.mongo = mongo;
         
         // Operations
-        AddUserOperation addUserOperation = new AddUserOperation();
-        addUserOperation.Notify += EventListener.OnOperation;
-        ShowUserOperation showUserOperation = new ShowUserOperation();
-        showUserOperation.Notify += EventListener.OnOperation;
-        UpdateUserOperation updateUserOperation = new UpdateUserOperation();
-        updateUserOperation.Notify += EventListener.OnOperation;
-        DeleteUserOperation deleteUserOperation = new DeleteUserOperation();
-        deleteUserOperation.Notify += EventListener.OnOperation;
-        
+        AddUserOperation addUser = new AddUserOperation();
+        addUser.Notify += EventListener.OnOperation;
+        ShowUserOperation showUser = new ShowUserOperation();
+        showUser.Notify += EventListener.OnOperation;
+        UpdateUserOperation updateUser = new UpdateUserOperation();
+        updateUser.Notify += EventListener.OnOperation;
+        DeleteUserOperation deleteUser = new DeleteUserOperation();
+        deleteUser.Notify += EventListener.OnOperation;
+
+        addUser.Operation(mongo ,person, EventArgs.Empty());
+
         // Log in and show menu
-        LogIn(mongo);
-        ShowMenu();
+        //LogIn(mongo);
+        //ShowMenu();
     }
 }

@@ -24,6 +24,6 @@ public class AddUserOperation : CRUD
             Message = "User already exists.";
         }
 
-        Notify?.Invoke(this, person, new MongoDBOperationEventArgs("Add", Success, Message));
+        Notify?.Invoke(this, person, e);
     }
 }
