@@ -1,11 +1,11 @@
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Users;
 
-namespace Inpost_org.Services.Operations;
+namespace Inpost_org.Services.Operations.UserOperations;
 
-public class AddUserOperation : CRUD
+public class AddUserOperation : crudUsers
 {
-    public event MongoDBOperationHandler Notify;
+    public event MongoDBUserOperationHandler Notify;
 
     public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {

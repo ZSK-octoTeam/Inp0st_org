@@ -2,21 +2,24 @@ using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Users;
 using MongoDB.Driver;
 
-namespace Inpost_org.Services.Operations;
+namespace Inpost_org.Services.Operations.UserOperations;
 
-public class DeleteUserOperation
+public class UpdateUserOperation : crudUsers
 {
     public bool Success { get; private set; }
     public string Message { get; private set; }
-    public event MongoDBOperationHandler Notify;
+    
+    
+    public event MongoDBUserOperationHandler Notify;
 
     public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
-        e.Operation = "DeleteUser";
+        e.Operation = "UpdateUser";
         if (PassphraseMenager.VerifyUser(person))
         {
             var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
-            mongo.collectionUsers.DeleteOne(filter);
+            var update = Builders<PersonModel>.Update.Set(r => r.Password, PassphraseMenager.HashPassword(person.Password));
+            mongo.collectionUsers.UpdateOne(filter, update);
             e.Success = true;
         }
         else

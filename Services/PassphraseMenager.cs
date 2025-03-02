@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using Inpost_org.Users.Deliveries;
 using Inpost_org.Users;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -24,6 +25,25 @@ public class PassphraseMenager
                 return true;
             }
         }
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if user has already a parcel named like that
+    /// </summary>
+    /// <param name="parcel"></param>
+    /// <returns>true if he has</returns>
+    public static bool FindParcel(ParcelModel parcel)
+    {
+        foreach (var databaseParcel in mongo.collectionParcels.Find(new BsonDocument()).ToList())
+        {
+            if (databaseParcel.ParcelName == parcel.ParcelName &&
+                databaseParcel.Recipient.Username == parcel.Recipient.Username)
+            {
+                return true;
+            }
+        }
+
         return false;
     }
 

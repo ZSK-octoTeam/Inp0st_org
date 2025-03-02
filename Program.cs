@@ -1,4 +1,6 @@
-﻿using Inpost_org.Services.NotificationMethods;
+﻿using Inpost_org.Services.Operations.ParcelOperations;
+using Inpost_org.Services.Operations.UserOperations;
+using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Services.Operations;
 using Inpost_org.Services;
 using Inpost_org.Users.Deliveries;
@@ -115,13 +117,13 @@ internal class Program
         
         // Operations
         AddUserOperation addUser = new AddUserOperation();
-        addUser.Notify += EventListener.OnOperation;
+        addUser.Notify += EventListener.OnUserOperation;
         ShowUserOperation showUser = new ShowUserOperation();
-        showUser.Notify += EventListener.OnOperation;
+        showUser.Notify += EventListener.OnUserOperation;
         UpdateUserOperation updateUser = new UpdateUserOperation();
-        updateUser.Notify += EventListener.OnOperation;
+        updateUser.Notify += EventListener.OnUserOperation;
         DeleteUserOperation deleteUser = new DeleteUserOperation();
-        deleteUser.Notify += EventListener.OnOperation;
+        deleteUser.Notify += EventListener.OnUserOperation;
         
         // Log in and show menu
         //LogIn(mongo);
