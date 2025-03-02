@@ -109,7 +109,6 @@ internal class Program
     
     public static void Main(string[] args)
     {
-        PersonModel person = new PersonModel("guc10", "maslo");
         // Database
         MongoDBService mongo = ConnectToDatabase();
         PassphraseMenager.mongo = mongo;
@@ -123,9 +122,7 @@ internal class Program
         updateUser.Notify += EventListener.OnOperation;
         DeleteUserOperation deleteUser = new DeleteUserOperation();
         deleteUser.Notify += EventListener.OnOperation;
-
-        addUser.Operation(mongo ,person, EventArgs.Empty());
-
+        
         // Log in and show menu
         //LogIn(mongo);
         //ShowMenu();

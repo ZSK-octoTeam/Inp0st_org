@@ -14,20 +14,20 @@ public class UpdateUserOperation
 
     public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
+        e.Operation = "UpdateUser";
         if (PassphraseMenager.VerifyUser(person))
         {
             var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
             var update = Builders<PersonModel>.Update.Set(r => r.Password, PassphraseMenager.HashPassword(person.Password));
             mongo.collectionUsers.UpdateOne(filter, update);
-            Success = true;
-            Message = "User updated.";
+            e.Success = true;
         }
         else
         {
-            Success = false;
-            Message = "User could not be updated.";
+            e.Success = false;
+            e.Message = "User does not exist.";
         }
 
-        Notify?.Invoke(this, person, new MongoDBOperationEventArgs("update", Success, Message));
+        Notify?.Invoke(this, person, e);
     }
 }

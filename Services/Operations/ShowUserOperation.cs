@@ -11,32 +11,35 @@ public class ShowUserOperation
 
     public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
+        e.Operation = "Show users";
         if (PassphraseMenager.VerifyUser(person))
         {
             var rbac = new RBAC();
-            Console.WriteLine($"Username: {person.Username}");
-            Console.WriteLine("Role: ");
+            e.Operation = "ShowUser";
+            e.Message += $"Username: {person.Username}\n";
+            e.Message += "Role: \n";
             foreach (var role in person.Roles)
             {
-                Console.WriteLine(role);
+                e.Message += $"-{role}\n";
             }
 
-            Success = true;
-            Console.WriteLine("Has permission to: ");
+            e.Message += "\nHas permission to: \n";            
             foreach (var permission in Enum.GetValues(typeof(Permission)))
             {
                 if (rbac.HasPermission(person, (Permission)permission))
                 {
-                    Console.WriteLine(permission);
+                    e.Message += $"-{permission}\n";
                 }
             }
+            
+            e.Success = true;
         }
         else
         {
-            Success = false;
-            Message = "There is nothing to show.";
+            e.Success = false;
+            e.Message = "User does not exist.";
         }
 
-        Notify?.Invoke(this, person, new MongoDBOperationEventArgs("show", Success, Message));
+        Notify?.Invoke(this, person, e);
     }
 }

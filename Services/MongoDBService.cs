@@ -41,9 +41,8 @@ public class MongoDBService
     public void SetUser(string databaseUser, string databasePassword)
     {
         DatabaseUser = databaseUser;
-        //DatabasePassword = PassphraseMenager.HashPassword(databasePassword);
         DatabasePassword = databasePassword;
-        _connectionString = $"mongodb+srv://{databaseUser}:{databasePassword}@datacluster.kcry9.mongodb.net/?retryWrites=true&w=majority&appName=dataCluster";
+        _connectionString = $"mongodb+srv://{DatabaseUser}:{DatabasePassword}@datacluster.kcry9.mongodb.net/?retryWrites=true&w=majority&appName=dataCluster";
     }
     
     ///<summary>
