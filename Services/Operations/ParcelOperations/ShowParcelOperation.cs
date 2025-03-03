@@ -11,28 +11,29 @@ public class ShowParcelOperation : crudParcels
     public void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "ShowParcel";
-        var userParcels = DatabaseSearch.FindParcels(person);
-        if (userParcels.ContainsValue(parcel))
+        e.Success = true;
+        foreach (var userParcel in person.Parcels)
         {
-            var databaseParcel = parcel;
-            foreach (var iterator in userParcels)
+            if (userParcel.ParcelName == parcel.ParcelName)
             {
-                if (iterator.Value.ParcelName == parcel.ParcelName)
-                {
-                    databaseParcel = iterator.Value;
-                    break;
-                }
+                parcel = userParcel;
+                e.Success = false;
+                break;
             }
-            e.Success = true;
-            e.Message += "Info about parcel: \n";
-            e.Message += $"Parcel name: {databaseParcel.ParcelName}\n";
-            e.Message += $"Parcel reciver: {databaseParcel.Recipient}\n";
-            e.Message += $"Parcel status: {databaseParcel.Status}\n";
+        }
+
+        if (!e.Success)
+        {
+           e.Success = true;
+           e.Message += $"Parcel name: {parcel.ParcelName}\n";
+           e.Message += $"Parcel status: {parcel.Status}\n";
+           e.Message += $"Parcel deliverer {parcel.Sender}\n";
+           e.Message += $"Parcel owner {parcel.Recipient}\n";
         }
         else
         {
             e.Success = false;
-            e.Message = $"User {person.Username} does not have parcel: {parcel.ParcelName}";
+            e.Message += $"User: {person.Username} does not have a parcel called: {parcel.ParcelName}\n";
         }
         
         Notify?.Invoke(this, parcel, person, e);
