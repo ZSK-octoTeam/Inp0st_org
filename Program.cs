@@ -42,6 +42,7 @@ internal class Program
                 {
                     if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Password)
                     {
+                        person = databasePerson;
                         Console.WriteLine("Log in successful.");
                         return person;
                     }
@@ -80,13 +81,14 @@ internal class Program
     
     public static void ShowMenu(PersonModel loggedIn, MongoDBService mongo)
     {
-        while(true){
+        while(loggedIn.Roles.Contains(Role.Administrator)){
             Console.WriteLine("=== MENU ===");
             Console.WriteLine("1. Menage clients");
             Console.WriteLine("2. Menage deliverers");
             Console.WriteLine("3. Menage packages");
-            Console.WriteLine("4. Log out");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("4. Menage users");
+            Console.WriteLine("5. Log out");
+            Console.WriteLine("6. Exit");
             
             int choice = GetInputInt("Enter your choice:");
 
@@ -102,11 +104,15 @@ internal class Program
                     ShowPackagesMenu(loggedIn, mongo);
                     break;
                 case 4:
-                    Console.Clear();
-                    Console.WriteLine($"Logged out successfully.");
-                    LogIn(mongo);
+                    ShowUsersMenu(loggedIn, mongo);
                     break;
                 case 5:
+                    Console.Clear();
+                    Console.WriteLine($"Logged out successfully.");
+                    loggedIn = LogIn(mongo);
+                    ChooseMenu(loggedIn, mongo);
+                    break;
+                case 6:
                     Environment.Exit(0);
                     break;
                 default:
@@ -121,10 +127,12 @@ internal class Program
         while(true){
             Console.WriteLine("=== CLIENTS MENU ===");
             Console.WriteLine("1. Add client");
-            Console.WriteLine("2. Show client");
+            Console.WriteLine("2. Show all clients");
             Console.WriteLine("3. Delete client");
-            Console.WriteLine("4. Back");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("4. Update client");
+            Console.WriteLine("5. Search client");
+            Console.WriteLine("6. Back");
+            Console.WriteLine("7. Exit");
             
             int choice = GetInputInt("Enter your choice:");
 
@@ -140,9 +148,15 @@ internal class Program
                     DeleteClient(mongo);
                     break;
                 case 4:
-                    ShowMenu(loggedIn, mongo);
+                    //UpdateClient();
                     break;
                 case 5:
+                    //SearchClient();
+                    break;
+                case 6:
+                    ShowMenu(loggedIn, mongo);
+                    break;
+                case 7:
                     Environment.Exit(0);
                     break;
                 default:
@@ -157,10 +171,12 @@ internal class Program
         while(true){
             Console.WriteLine("=== DELIVERERS MENU ===");
             Console.WriteLine("1. Add deliverer");
-            Console.WriteLine("2. Show deliverer");
+            Console.WriteLine("2. Show all deliverers");
             Console.WriteLine("3. Delete deliverer");
-            Console.WriteLine("4. Back");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("4. Update deliverer");
+            Console.WriteLine("5. Search deliverer");
+            Console.WriteLine("6. Back");
+            Console.WriteLine("7. Exit");
             
             int choice = GetInputInt("Enter your choice:");
 
@@ -176,9 +192,15 @@ internal class Program
                     DeleteDeliverer(mongo);
                     break;
                 case 4:
-                    ShowMenu(loggedIn, mongo);
+                    //UpdateDeliverer();
                     break;
                 case 5:
+                    //SearchDeliverer();
+                    break;
+                case 6:
+                    ShowMenu(loggedIn, mongo);
+                    break;
+                case 7:
                     Environment.Exit(0);
                     break;
             }
@@ -190,10 +212,12 @@ internal class Program
         while(true){
             Console.WriteLine("=== PACKAGES MENU ===");
             Console.WriteLine("1. Add package");
-            Console.WriteLine("2. Show package");
+            Console.WriteLine("2. Show all packages");
             Console.WriteLine("3. Delete package");
-            Console.WriteLine("4. Back");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("4. Update package");
+            Console.WriteLine("5. Search package");
+            Console.WriteLine("6. Back");
+            Console.WriteLine("7. Exit");
             
             int choice = GetInputInt("Enter your choice:");
 
@@ -209,9 +233,179 @@ internal class Program
                     //DeletePackage();
                     break;
                 case 4:
-                    ShowMenu(loggedIn, mongo);
+                    //UpdatePackage();
                     break;
                 case 5:
+                    //SearchPackage();
+                    break;
+                case 6:
+                    ShowMenu(loggedIn, mongo);
+                    break;
+                case 7:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
+            }
+        }
+    }
+
+    public static void ShowNormalMenu(PersonModel loggedIn, MongoDBService mongo)
+    {
+        while(!loggedIn.Roles.Contains(Role.Administrator)){
+            Console.WriteLine("=== MENU ===");
+            Console.WriteLine("1. Menage packages");
+            Console.WriteLine("2. Log out");
+            Console.WriteLine("3. Exit");
+            
+            int choice = GetInputInt("Enter your choice:");
+
+            switch (choice)
+            {
+                case 1:
+                    if(loggedIn.Roles.Contains(Role.InpostClient)){
+                        ShowPackagesMenuClient(loggedIn, mongo);
+                    }
+                    else{
+                        ShowPackagesMenuDelivery(loggedIn, mongo);
+                    }
+                    break;
+                case 2:
+                    Console.Clear();
+                    Console.WriteLine($"Logged out successfully.");
+                    loggedIn = LogIn(mongo);
+                    ChooseMenu(loggedIn, mongo);
+                    break;
+                case 3:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
+            }
+        }
+    }
+
+    public static void ShowUsersMenu(PersonModel loggedIn, MongoDBService mongo)
+    {
+        while(true){
+            Console.WriteLine("=== USERS MENU ===");
+            Console.WriteLine("1. Add user");
+            Console.WriteLine("2. Show all users");
+            Console.WriteLine("3. Update user");
+            Console.WriteLine("4. Delete user");
+            Console.WriteLine("5. Search user");
+            Console.WriteLine("6. Back");
+            Console.WriteLine("7. Exit");
+            
+            int choice = GetInputInt("Enter your choice:");
+
+            switch (choice)
+            {
+                case 1:
+                    //AddUser();
+                    break;
+                case 2:
+                    //ShowUser();
+                    break;
+                case 3:
+                    //UpdateUser();
+                    break;
+                case 4:
+                    //DeleteUser();
+                    break;
+                case 5:
+                    //SearchUser();
+                    break;
+                case 6:
+                    ShowMenu(loggedIn, mongo);
+                    break;
+                case 7:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
+            }
+        }
+    }
+
+    public static void ShowPackagesMenuClient(PersonModel loggedIn, MongoDBService mongo)
+    {
+        while(true){
+            Console.WriteLine("=== PACKAGES MENU ===");
+            Console.WriteLine("1. Order package");
+            Console.WriteLine("2. Show all my packages");
+            Console.WriteLine("3. Cancel package");
+            Console.WriteLine("4. Search package");
+            Console.WriteLine("5. Back");
+            Console.WriteLine("6. Exit");
+            
+            int choice = GetInputInt("Enter your choice:");
+
+            switch (choice)
+            {
+                case 1:
+                    //AddPackage();
+                    break;
+                case 2:
+                    //ShowMyPackages();
+                    break;
+                case 3:
+                    //DeletePackage();
+                    break;
+                case 4:
+                    //SearchPackage();
+                    break;
+                case 5:
+                    ShowNormalMenu(loggedIn, mongo);
+                    break;
+                case 6:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
+            }
+        }
+    }
+
+    public static void ShowPackagesMenuDelivery(PersonModel loggedIn, MongoDBService mongo)
+    {
+        while(true){
+            Console.WriteLine("=== PACKAGES MENU ===");
+            Console.WriteLine("1. Show all my packages");
+            Console.WriteLine("2. Show all packages");
+            Console.WriteLine("3. Pick up package");
+            Console.WriteLine("4. Deliver package");
+            Console.WriteLine("5. Search package");
+            Console.WriteLine("6. Back");
+            Console.WriteLine("7. Exit");
+            
+            int choice = GetInputInt("Enter your choice:");
+
+            switch (choice)
+            {
+                case 1:
+                    //ShowMyPackages();
+                    break;
+                case 2:
+                    //ShowAllPackages();
+                    break;
+                case 3:
+                    //PickUpPackage();
+                    break;
+                case 4:
+                    //DeliverPackage();
+                    break;
+                case 5:
+                    //SearchPackage();
+                    break;
+                case 6:
+                    ShowNormalMenu(loggedIn, mongo);
+                    break;
+                case 7:
                     Environment.Exit(0);
                     break;
                 default:
@@ -351,7 +545,14 @@ internal class Program
         return;
     }
 
-
+    public static void ChooseMenu(PersonModel loggedIn, MongoDBService mongo){
+        if(loggedIn.Roles.Contains(Role.Administrator)){
+            ShowMenu(loggedIn, mongo);
+        }
+        else{
+            ShowNormalMenu(loggedIn, mongo);
+        }
+    }
     
     public static void Main(string[] args)
     {
@@ -359,19 +560,8 @@ internal class Program
         MongoDBService mongo = ConnectToDatabase();
         DatabaseSearch.mongo = mongo;
         
-        // Operations
-        AddUserOperation addUser = new AddUserOperation();
-        addUser.Notify += EventListener.OnUserOperation;
-        ShowUserOperation showUser = new ShowUserOperation();
-        showUser.Notify += EventListener.OnUserOperation;
-        UpdateUserOperation updateUser = new UpdateUserOperation();
-        updateUser.Notify += EventListener.OnUserOperation;
-        DeleteUserOperation deleteUser = new DeleteUserOperation();
-        deleteUser.Notify += EventListener.OnUserOperation;
-        
-        
         // Log in and show menu
         PersonModel loggedIn = LogIn(mongo);
-        ShowMenu(loggedIn, mongo);
+        ChooseMenu(loggedIn, mongo);
     }
 }
