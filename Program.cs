@@ -29,7 +29,7 @@ internal class Program
         return input;
     }
     
-    public static void LogIn(MongoDBService mongo)
+    public static PersonModel LogIn(MongoDBService mongo)
     {
             string username = GetInputString("Enter your username:");
             string password = GetInputString("Enter your password:");
@@ -40,21 +40,23 @@ internal class Program
             {
                 if (databasePerson.Username == person.Username)
                 {
-                    if(PassphraseMenager.HashPassword(person.Password) == databasePerson.Password)
+                    if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Password)
                     {
                         Console.WriteLine("Log in successful.");
-                        ShowMenu();
+                        return person;
                     }
                     else
                     {
                         Console.WriteLine("Log in failed. Wrong password.");
                         LogIn(mongo);
+                        return null;
                     }
                 
                 }
             }
             Console.WriteLine("Log in failed. User not found.");
             LogIn(mongo);
+            return null;
     }
     
     public static MongoDBService ConnectToDatabase()
@@ -102,7 +104,7 @@ internal class Program
                 case 4:
                     Console.Clear();
                     Console.WriteLine($"Logged out successfully.");
-                    LogIn(PassphraseMenager.mongo);
+                    LogIn(ConnectToDatabase());
                     break;
                 case 5:
                     Environment.Exit(0);
@@ -214,7 +216,7 @@ internal class Program
     {
         // Database
         MongoDBService mongo = ConnectToDatabase();
-        PassphraseMenager.mongo = mongo;
+        DatabaseSearch.mongo = mongo;
         
         // Operations
         AddUserOperation addUser = new AddUserOperation();
@@ -227,6 +229,7 @@ internal class Program
         deleteUser.Notify += EventListener.OnUserOperation;
         
         // Log in and show menu
-        LogIn(mongo);
+        PersonModel loggedIn = LogIn(mongo);
+        ShowMenu();
     }
 }

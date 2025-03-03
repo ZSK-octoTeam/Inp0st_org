@@ -13,7 +13,7 @@ public class EventListener
         Console.WriteLine($"{e.Message}");
     }
 
-    public static void OnParcelOperation(object sender, ParcelModel parcel, MongoDBOperationEventArgs e)
+    public static void OnParcelOperation(object sender, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         string action = e.Success ? "success" : "failure";
         Console.WriteLine($"Operation '{e.Operation}' completed for parcel: {parcel.ParcelName}, with {action}");

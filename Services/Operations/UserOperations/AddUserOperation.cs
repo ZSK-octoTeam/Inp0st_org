@@ -1,5 +1,7 @@
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Users;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
@@ -10,9 +12,9 @@ public class AddUserOperation : crudUsers
     public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "AddUser";
-        if (!PassphraseMenager.VerifyUser(person))
+        if (!DatabaseSearch.FindUser(person))
         {
-            person.Password = PassphraseMenager.HashPassword(person.Password);
+            person.Password = DatabaseSearch.HashPassword(person.Password);
             mongo.collectionUsers.InsertOne(person);
             e.Success = true;
         }

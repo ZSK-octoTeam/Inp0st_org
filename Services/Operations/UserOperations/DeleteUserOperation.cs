@@ -13,7 +13,7 @@ public class DeleteUserOperation : crudUsers
     public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "DeleteUser";
-        if (PassphraseMenager.VerifyUser(person))
+        if (DatabaseSearch.FindUser(person))
         {
             var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
             mongo.collectionUsers.DeleteOne(filter);

@@ -1,5 +1,7 @@
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Users;
+using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
@@ -12,13 +14,25 @@ public class ShowUserOperation : crudUsers
     public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "Show users";
-        if (PassphraseMenager.VerifyUser(person))
+        e.Success = false;
+        PersonModel databasePerson = null;
+        foreach (var user in mongo.collectionUsers.Find(new BsonDocument()).ToList())
+        {
+            if (user.Username == person.Username)
+            {
+                databasePerson = user;
+                e.Success = true;
+                break;
+            }
+        }
+        
+        if (e.Success)
         {
             var rbac = new RBAC();
             e.Operation = "ShowUser";
-            e.Message += $"Username: {person.Username}\n";
+            e.Message += $"Username: {databasePerson.Username}\n";
             e.Message += "Role: \n";
-            foreach (var role in person.Roles)
+            foreach (var role in databasePerson.Roles)
             {
                 e.Message += $"-{role}\n";
             }
@@ -26,13 +40,11 @@ public class ShowUserOperation : crudUsers
             e.Message += "\nHas permission to: \n";            
             foreach (var permission in Enum.GetValues(typeof(Permission)))
             {
-                if (rbac.HasPermission(person, (Permission)permission))
+                if (rbac.HasPermission(databasePerson, (Permission)permission))
                 {
                     e.Message += $"-{permission}\n";
                 }
             }
-            
-            e.Success = true;
         }
         else
         {
@@ -40,6 +52,6 @@ public class ShowUserOperation : crudUsers
             e.Message = "User does not exist.";
         }
 
-        Notify?.Invoke(this, person, e);
+        Notify?.Invoke(this, databasePerson, e);
     }
 }
