@@ -22,7 +22,7 @@ internal class Program
     {
         int input;
         Console.WriteLine(prompt);
-        while (!int.TryParse(Console.ReadLine(), out input) || input < 1 || input > 5)
+        while (!int.TryParse(Console.ReadLine(), out input))
         {
             Console.WriteLine("Invalid input. Please enter a correct number:");
         }
@@ -109,6 +109,9 @@ internal class Program
                 case 5:
                     Environment.Exit(0);
                     break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
             }
         }
     }
@@ -141,6 +144,9 @@ internal class Program
                     break;
                 case 5:
                     Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
                     break;
             }
         }
@@ -208,6 +214,9 @@ internal class Program
                 case 5:
                     Environment.Exit(0);
                     break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
             }
         }
     }
@@ -228,12 +237,8 @@ internal class Program
         {
             if (databasePerson.Username == addedUser.Username)
             {
-                if(databasePerson.Roles.Contains(Role.InpostClient))
+                if(!databasePerson.Roles.Contains(Role.InpostClient))
                 {
-                    Console.WriteLine("User already exists.");
-                    return;
-                }
-                else{
                     databasePerson.AddRole(Role.InpostClient);
                     var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
                     var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
@@ -243,6 +248,7 @@ internal class Program
                 }
             }
         }
+        addedUser.AddRole(Role.InpostClient);
         addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs());
     }
 
@@ -265,22 +271,18 @@ internal class Program
                     return;
                 }
 
-                if(databasePerson.Roles.Count == 0)
-                {
-                    deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
-                    return;
-                }
-                else
+                if(databasePerson.Roles.Count != 0)
                 {
                     var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
                     var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
                     mongo.collectionUsers.UpdateOne(filter, update);
                     System.Console.WriteLine("Deleted role client from user.");
                     return;
+                    
                 }
             }
         }
-        Console.WriteLine("User not found.");
+        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
         return;
     }
 
@@ -300,12 +302,8 @@ internal class Program
         {
             if (databasePerson.Username == addedUser.Username)
             {
-                if(databasePerson.Roles.Contains(Role.InpostEmployee))
+                if(!databasePerson.Roles.Contains(Role.InpostEmployee))
                 {
-                    Console.WriteLine("User already exists.");
-                    return;
-                }
-                else{
                     databasePerson.AddRole(Role.InpostEmployee);
                     var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
                     var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
@@ -315,6 +313,7 @@ internal class Program
                 }
             }
         }
+        addedUser.AddRole(Role.InpostEmployee);
         addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs());
     }
 
@@ -337,22 +336,18 @@ internal class Program
                     return;
                 }
 
-                if(databasePerson.Roles.Count == 0)
-                {
-                    deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
-                    return;
-                }
-                else
+                if(databasePerson.Roles.Count != 0)
                 {
                     var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
                     var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
                     mongo.collectionUsers.UpdateOne(filter, update);
                     Console.WriteLine("Deleted role deliverer from user.");
                     return;
+                    
                 }
             }   
         }
-        Console.WriteLine("User not found.");
+        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
         return;
     }
 
