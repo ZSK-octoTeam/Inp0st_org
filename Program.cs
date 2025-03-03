@@ -128,13 +128,13 @@ internal class Program
             switch (choice)
             {
                 case 1:
-                    //AddClient();
+                    AddClient(mongo);
                     break;
                 case 2:
-                    //ShowClient();
+                    ShowClients(loggedIn, mongo);
                     break;
                 case 3:
-                    //DeleteClient();
+                    DeleteClient(mongo);
                     break;
                 case 4:
                     ShowMenu(loggedIn, mongo);
@@ -161,13 +161,13 @@ internal class Program
             switch (choice)
             {
                 case 1:
-                    //AddDeliverer();
+                    AddDeliverer(mongo);
                     break;
                 case 2:
-                    //ShowDeliverer();
+                    ShowDeliverers(loggedIn, mongo);
                     break;
                 case 3:
-                    //DeleteDeliverer();
+                    DeleteDeliverer(mongo);
                     break;
                 case 4:
                     ShowMenu(loggedIn, mongo);
@@ -211,6 +211,152 @@ internal class Program
             }
         }
     }
+
+    public static void ShowClients(PersonModel loggedIn,MongoDBService mongo){
+        Console.WriteLine("=== CLIENTS ===");
+        ShowUsersOperation showUsers = new ShowUsersOperation();
+        showUsers.Notify += EventListener.OnUserOperation;
+        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void AddClient(MongoDBService mongo){
+        Console.WriteLine("=== ADD CLIENT ===");
+        AddUserOperation addUser = new AddUserOperation();
+        addUser.Notify += EventListener.OnUserOperation;
+        PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
+        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
+        {
+            if (databasePerson.Username == addedUser.Username)
+            {
+                if(databasePerson.Roles.Contains(Role.InpostClient))
+                {
+                    Console.WriteLine("User already exists.");
+                    return;
+                }
+                else{
+                    databasePerson.AddRole(Role.InpostClient);
+                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
+                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
+                    mongo.collectionUsers.UpdateOne(filter, update);
+                    Console.WriteLine("Added role client to user.");
+                    return;
+                }
+            }
+        }
+        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs());
+    }
+
+    public static void DeleteClient(MongoDBService mongo){
+        Console.WriteLine("=== DELETE CLIENT ===");
+        DeleteUserOperation deleteUser = new DeleteUserOperation();
+        deleteUser.Notify += EventListener.OnUserOperation;
+        PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
+        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
+        {
+            if (databasePerson.Username == deletedUser.Username)
+            {
+                if(databasePerson.Roles.Contains(Role.InpostClient))
+                {
+                    databasePerson.Roles.Remove(Role.InpostClient);
+                }
+                else
+                {
+                    Console.WriteLine("User is not a client.");
+                    return;
+                }
+
+                if(databasePerson.Roles.Count == 0)
+                {
+                    deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
+                    return;
+                }
+                else
+                {
+                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
+                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
+                    mongo.collectionUsers.UpdateOne(filter, update);
+                    System.Console.WriteLine("Deleted role client from user.");
+                    return;
+                }
+            }
+        }
+        Console.WriteLine("User not found.");
+        return;
+    }
+
+    public static void ShowDeliverers(PersonModel loggedIn,MongoDBService mongo){
+        Console.WriteLine("=== DELIVERERS ===");
+        ShowUsersOperation showUsers = new ShowUsersOperation();
+        showUsers.Notify += EventListener.OnUserOperation;
+        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void AddDeliverer(MongoDBService mongo){
+        Console.WriteLine("=== ADD DELIVERER ===");
+        AddUserOperation addUser = new AddUserOperation();
+        addUser.Notify += EventListener.OnUserOperation;
+        PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
+        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
+        {
+            if (databasePerson.Username == addedUser.Username)
+            {
+                if(databasePerson.Roles.Contains(Role.InpostEmployee))
+                {
+                    Console.WriteLine("User already exists.");
+                    return;
+                }
+                else{
+                    databasePerson.AddRole(Role.InpostEmployee);
+                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
+                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
+                    mongo.collectionUsers.UpdateOne(filter, update);
+                    Console.WriteLine("Added role deliverer to user.");
+                    return;
+                }
+            }
+        }
+        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs());
+    }
+
+    public static void DeleteDeliverer(MongoDBService mongo){
+        Console.WriteLine("=== DELETE DELIVERER ===");
+        DeleteUserOperation deleteUser = new DeleteUserOperation();
+        deleteUser.Notify += EventListener.OnUserOperation;
+        PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
+        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
+        {
+            if (databasePerson.Username == deletedUser.Username)
+            {
+                if(databasePerson.Roles.Contains(Role.InpostEmployee))
+                {
+                    databasePerson.Roles.Remove(Role.InpostEmployee);
+                }
+                else
+                {
+                    Console.WriteLine("User is not a deliverer.");
+                    return;
+                }
+
+                if(databasePerson.Roles.Count == 0)
+                {
+                    deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
+                    return;
+                }
+                else
+                {
+                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
+                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
+                    mongo.collectionUsers.UpdateOne(filter, update);
+                    Console.WriteLine("Deleted role deliverer from user.");
+                    return;
+                }
+            }   
+        }
+        Console.WriteLine("User not found.");
+        return;
+    }
+
+
     
     public static void Main(string[] args)
     {
@@ -227,6 +373,7 @@ internal class Program
         updateUser.Notify += EventListener.OnUserOperation;
         DeleteUserOperation deleteUser = new DeleteUserOperation();
         deleteUser.Notify += EventListener.OnUserOperation;
+        
         
         // Log in and show menu
         PersonModel loggedIn = LogIn(mongo);
