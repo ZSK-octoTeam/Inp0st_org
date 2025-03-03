@@ -2,29 +2,29 @@ using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Users;
 using MongoDB.Driver;
 
-namespace Inpost_org.Services.Operations;
+namespace Inpost_org.Services.Operations.UserOperations;
 
-public class DeleteUserOperation
+public class DeleteUserOperation : crudUsers
 {
     public bool Success { get; private set; }
     public string Message { get; private set; }
-    public event MongoDBOperationHandler Notify;
+    public event MongoDBUserOperationHandler Notify;
 
     public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
-        if (PassphraseMenager.VerifyUser(person))
+        e.Operation = "DeleteUser";
+        if (DatabaseSearch.FindUser(person))
         {
             var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
             mongo.collectionUsers.DeleteOne(filter);
-            Success = true;
-            Message = "User deleted.";
+            e.Success = true;
         }
         else
         {
-            Success = false;
-            Message = "User could not be deleted.";
+            e.Success = false;
+            e.Message = "User does not exist.";
         }
 
-        Notify?.Invoke(this, person, new MongoDBOperationEventArgs("delete", Success, Message));
+        Notify?.Invoke(this, person, e);
     }
 }

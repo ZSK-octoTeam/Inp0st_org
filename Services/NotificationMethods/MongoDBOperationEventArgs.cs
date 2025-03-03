@@ -1,21 +1,15 @@
 namespace Inpost_org.Services.NotificationMethods;
 
-public class MongoDBOperationEventArgs
+public class MongoDBOperationEventArgs : EventArgs
 {
     public string Operation { get; set; }
     public bool Success { get; set; }
     public string Message { get; set; }
     
-    public MongoDBOperationEventArgs(string operation, bool success, string message)
+    public MongoDBOperationEventArgs()
     {
-        Operation = operation;
-        Success = success;
-        if (Success)
-        {
-            Message = $"with success, {message}";
-        }else
-        {
-            Message = $"with failure, {message}";
-        }
+        Operation = "";
+        Success = false;
+        Message = "";
     }
 }

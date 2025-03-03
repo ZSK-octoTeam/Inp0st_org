@@ -1,7 +1,10 @@
-﻿using Inpost_org.Services;
+﻿using Inpost_org.Services.Operations.ParcelOperations;
+using Inpost_org.Services.Operations.UserOperations;
+using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Services.Operations;
-using Inpost_org.Users;
+using Inpost_org.Services;
 using Inpost_org.Users.Deliveries;
+using Inpost_org.Users;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
@@ -26,7 +29,7 @@ internal class Program
         return input;
     }
     
-    public static void LogIn(MongoDBService mongo)
+    public static PersonModel LogIn(MongoDBService mongo)
     {
         while (true)
         {
@@ -39,10 +42,10 @@ internal class Program
             {
                 if (databasePerson.Username == person.Username)
                 {
-                    if(PassphraseMenager.HashPassword(person.Password) == databasePerson.Password)
+                    if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Password)
                     {
                         Console.WriteLine("Log in successful.");
-                        ShowMenu();
+                        return person;
                     }
                     else
                     {
@@ -110,20 +113,20 @@ internal class Program
     {
         // Database
         MongoDBService mongo = ConnectToDatabase();
-        PassphraseMenager.mongo = mongo;
+        DatabaseSearch.mongo = mongo;
         
         // Operations
-        AddUserOperation addUserOperation = new AddUserOperation();
-        addUserOperation.Notify += EventListener.OnOperation;
-        ShowUserOperation showUserOperation = new ShowUserOperation();
-        showUserOperation.Notify += EventListener.OnOperation;
-        UpdateUserOperation updateUserOperation = new UpdateUserOperation();
-        updateUserOperation.Notify += EventListener.OnOperation;
-        DeleteUserOperation deleteUserOperation = new DeleteUserOperation();
-        deleteUserOperation.Notify += EventListener.OnOperation;
+        AddUserOperation addUser = new AddUserOperation();
+        addUser.Notify += EventListener.OnUserOperation;
+        ShowUserOperation showUser = new ShowUserOperation();
+        showUser.Notify += EventListener.OnUserOperation;
+        UpdateUserOperation updateUser = new UpdateUserOperation();
+        updateUser.Notify += EventListener.OnUserOperation;
+        DeleteUserOperation deleteUser = new DeleteUserOperation();
+        deleteUser.Notify += EventListener.OnUserOperation;
         
         // Log in and show menu
-        LogIn(mongo);
+        PersonModel loggedIn = LogIn(mongo);
         ShowMenu();
     }
 }

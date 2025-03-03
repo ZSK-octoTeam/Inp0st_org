@@ -42,7 +42,7 @@ public class MongoDBService
     {
         DatabaseUser = databaseUser;
         DatabasePassword = databasePassword;
-        _connectionString = $"mongodb+srv://{databaseUser}:{databasePassword}@datacluster.kcry9.mongodb.net/?retryWrites=true&w=majority&appName=dataCluster";
+        _connectionString = $"mongodb+srv://{DatabaseUser}:{DatabasePassword}@datacluster.kcry9.mongodb.net/?retryWrites=true&w=majority&appName=dataCluster";
     }
     
     ///<summary>
