@@ -28,30 +28,6 @@ public class DatabaseSearch
         }
         return false;
     }
-
-    /// <summary>
-    /// Checks if user has already a parcel named like that
-    /// </summary>
-    /// <param name="parcel"></param>
-    /// <returns>true if he has</returns>
-    public static bool FindParcel(ParcelModel parcel, PersonModel person)
-    {
-        foreach (var databaseParcel in mongo.collectionParcels.Find(new BsonDocument()).ToList())
-        {
-            if (databaseParcel.ParcelName == parcel.ParcelName &&
-            person.Username == "adminUser")
-            {
-                return true;   
-            }
-            if (databaseParcel.ParcelName == parcel.ParcelName &&
-                (databaseParcel.Recipient.Username == person.Username ||
-                 databaseParcel.Sender.Username == person.Username))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
      
     /// <summary>
     /// Sorts users by their roles and the returns them in a dictionary

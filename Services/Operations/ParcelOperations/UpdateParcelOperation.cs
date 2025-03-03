@@ -12,7 +12,8 @@ public class UpdateParcelOperation : crudParcels
     public void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "UpdateParcel";
-        if (DatabaseSearch.FindParcel(parcel, person))
+        var userParcels = DatabaseSearch.FindParcels(person);
+        if (userParcels.ContainsValue(parcel))
         {
             var filter = Builders<ParcelModel>.Filter.Eq(r => r.Recipient.Username, person.Username);
             var update = Builders<ParcelModel>.Update.Set(r => r.Status, parcel.Status);
