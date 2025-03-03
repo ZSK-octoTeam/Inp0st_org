@@ -78,7 +78,7 @@ internal class Program
         return mongo;
     }
     
-    public static void ShowMenu()
+    public static void ShowMenu(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
             Console.WriteLine("=== MENU ===");
@@ -93,18 +93,18 @@ internal class Program
             switch (choice)
             {
                 case 1:
-                    ShowClientsMenu();
+                    ShowClientsMenu(loggedIn, mongo);
                     break;
                 case 2:
-                    ShowDeliverersMenu();
+                    ShowDeliverersMenu(loggedIn, mongo);
                     break;
                 case 3:
-                    ShowPackagesMenu();
+                    ShowPackagesMenu(loggedIn, mongo);
                     break;
                 case 4:
                     Console.Clear();
                     Console.WriteLine($"Logged out successfully.");
-                    LogIn(ConnectToDatabase());
+                    LogIn(mongo);
                     break;
                 case 5:
                     Environment.Exit(0);
@@ -113,7 +113,7 @@ internal class Program
         }
     }
 
-    public static void ShowClientsMenu()
+    public static void ShowClientsMenu(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
             Console.WriteLine("=== CLIENTS MENU ===");
@@ -137,7 +137,7 @@ internal class Program
                     //DeleteClient();
                     break;
                 case 4:
-                    ShowMenu();
+                    ShowMenu(loggedIn, mongo);
                     break;
                 case 5:
                     Environment.Exit(0);
@@ -146,7 +146,7 @@ internal class Program
         }
     }
 
-    public static void ShowDeliverersMenu()
+    public static void ShowDeliverersMenu(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
             Console.WriteLine("=== DELIVERERS MENU ===");
@@ -170,7 +170,7 @@ internal class Program
                     //DeleteDeliverer();
                     break;
                 case 4:
-                    ShowMenu();
+                    ShowMenu(loggedIn, mongo);
                     break;
                 case 5:
                     Environment.Exit(0);
@@ -179,7 +179,7 @@ internal class Program
         }
     }
 
-    public static void ShowPackagesMenu()
+    public static void ShowPackagesMenu(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
             Console.WriteLine("=== PACKAGES MENU ===");
@@ -203,7 +203,7 @@ internal class Program
                     //DeletePackage();
                     break;
                 case 4:
-                    ShowMenu();
+                    ShowMenu(loggedIn, mongo);
                     break;
                 case 5:
                     Environment.Exit(0);
@@ -230,6 +230,6 @@ internal class Program
         
         // Log in and show menu
         PersonModel loggedIn = LogIn(mongo);
-        ShowMenu();
+        ShowMenu(loggedIn, mongo);
     }
 }
