@@ -14,20 +14,31 @@ public class UpdateParcelOperation : crudParcels
         
         //repair
         e.Operation = "UpdateParcel";
-        var userParcels = DatabaseSearch.FindParcels();
-        if (userParcels.ContainsValue(parcel))
+        e.Success = false;
+        foreach (var userParcel in person.Parcels)
         {
-            var filter = Builders<ParcelModel>.Filter.Eq(r => r.Recipient.Username, person.Username);
-            var update = Builders<ParcelModel>.Update.Set(r => r.Status, parcel.Status);
+            if (parcel.Id == userParcel.Id)
+            {
+                e.Success = true;
+                break;
+            }
+        }
+
+        if (e.Success)
+        {
+            var filter = Builders<ParcelModel>.Filter.Eq(r => r.Id, parcel.Id);
+            var update = Builders<ParcelModel>.Update
+                .Set(r => r.ParcelName, parcel.ParcelName)
+                .Set(r => r.Recipient, parcel.Recipient)
+                .Set(r => r.Sender, parcel.Sender)
+                .Set(r => r.Status, parcel.Status);
             mongo.collectionParcels.UpdateOne(filter, update);
-            e.Success = true;
         }
         else
         {
-            e.Success = false;
-            e.Message = $"User: {person.Username} does not have a parcel named: {parcel.ParcelName}";
+            e.Message = $"User: {person.Username} does not have a parcel called: {parcel.ParcelName}\n";
         }
-        
+            
         Notify?.Invoke(this, parcel, person, e);
     }    
 }
