@@ -13,7 +13,11 @@ public class ShowUsersOperation : crudUsers
         e.Message += "Showing users: ";
         foreach (var user in DatabaseSearch.FindUsers())
         {
-            e.Message += $"{user.Value.Username} - {user.Key}\n";
+            e.Message += $"- {user.Key} - roles: \n";
+            foreach (var role in user.Value.Roles)
+            {
+                e.Message += $"- '{role}'\n";
+            }
         }
         e.Success = true;
         Notify?.Invoke(this, person, e);

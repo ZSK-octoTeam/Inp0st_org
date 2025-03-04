@@ -12,17 +12,26 @@ public class DeleteParcelOperation : crudParcels
     public void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "DeleteParcel";
-        var userParcels = DatabaseSearch.FindParcels(person);
-        if (userParcels.ContainsValue(parcel))
+        e.Success = true;
+        foreach (var userParcel in person.Parcels)
         {
-            var filter = Builders<ParcelModel>.Filter.Eq(r => r.Id, parcel.Id);
+            if (userParcel.ParcelName == parcel.ParcelName)
+            {
+                e.Success = false;
+                break;
+            }
+        }
+
+        if (!e.Success)
+        {
+            var filter = Builders<ParcelModel>.Filter.Eq(r => r.ParcelName, parcel.ParcelName);
             mongo.collectionParcels.DeleteOne(filter);
             e.Success = true;
         }
         else
         {
             e.Success = false;
-            e.Message = $"User: {person.Username} doesn't have parcel called: {parcel.ParcelName}.";
+            e.Message = $"User: {person.Username} already has a parcel named: {parcel.ParcelName}";
         }
         
         Notify?.Invoke(this, parcel, person, e);

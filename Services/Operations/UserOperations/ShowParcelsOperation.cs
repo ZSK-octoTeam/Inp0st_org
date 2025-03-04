@@ -14,9 +14,12 @@ public class ShowParcelsOperation : crudUsers
     {
         e.Operation = "Show parcels";
         e.Message += "Showing parcels: ";
-        foreach (var parcel in DatabaseSearch.FindParcels(person))
+        foreach (var databaseParcel in DatabaseSearch.FindParcels())
         {
-            e.Message += $"Parcel name: {parcel.Value.ParcelName}, parcel status: {parcel.Value.Status}, parcel reciver: {person.Username}\n";
+            if (person.Parcels.Contains(databaseParcel.Value))
+            {
+                e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, parcel reciver: {person.Username}\n";
+            }
         }
         e.Success = true;
         Notify?.Invoke(this, person, e);

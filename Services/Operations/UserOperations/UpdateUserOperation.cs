@@ -15,7 +15,8 @@ public class UpdateUserOperation : crudUsers
     public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "UpdateUser";
-        if (DatabaseSearch.FindUser(person))
+        var users = DatabaseSearch.FindUsers();
+        if (users.ContainsKey(person.Username))
         {
             var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
             var update = Builders<PersonModel>.Update.Set(r => r.Password, DatabaseSearch.HashPassword(person.Password));

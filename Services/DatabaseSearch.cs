@@ -4,54 +4,27 @@ using Inpost_org.Users.Deliveries;
 using Inpost_org.Users;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Linq;
 
 namespace Inpost_org.Services;
 
 public class DatabaseSearch
 {
     public static MongoDBService mongo;
-
-    /// <summary>
-    /// Check if the user is in the database
-    /// </summary>
-    /// <param name="person"></param>
-    /// <returns>true if there is a person with the same username in database</returns>
-    public static bool FindUser(PersonModel person)
-    {
-        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-        {
-            if (databasePerson.Username == person.Username)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
      
     /// <summary>
     /// Sorts users by their roles and the returns them in a dictionary
     /// </summary>
     /// <param name="person"></param>
     /// <returns>dictonary<Role, PersonModel></returns>
-    public static Dictionary<Role, PersonModel> FindUsers()
+    public static Dictionary<string, PersonModel> FindUsers()
     {
-        Dictionary<Role, PersonModel> users = new Dictionary<Role, PersonModel>();
+        Dictionary<string, PersonModel> users = new Dictionary<string, PersonModel>();
             foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
             {
-                if (databasePerson.Roles.Contains(Role.Administrator))
-                {
-                    users.Add(Role.Administrator, databasePerson);
-                }else if (databasePerson.Roles.Contains(Role.InpostEmployee))
-                {
-                    users.Add(Role.InpostEmployee, databasePerson);
-                }else if (databasePerson.Roles.Contains(Role.InpostClient))
-                {
-                    users.Add(Role.InpostClient, databasePerson);
-                }
+                users.Add(databasePerson.Username, databasePerson);
             }
-
-        return users.OrderBy(kvp => kvp.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            
+            return users;
     }
     
     /// <summary>
@@ -59,52 +32,15 @@ public class DatabaseSearch
     /// </summary>
     /// <param name="person"></param>
     /// <returns>List of Parcel(ParcelModel)</returns>
-    public static Dictionary<ParcelStatus,ParcelModel> FindParcels(PersonModel person)
+    public static Dictionary<string, ParcelModel> FindParcels()
     {
-        Dictionary<ParcelStatus,ParcelModel> parcels = new Dictionary<ParcelStatus, ParcelModel>();
+        Dictionary<string ,ParcelModel> parcels = new Dictionary<string, ParcelModel>();
+        foreach (var databaseParcel in mongo.collectionParcels.Find(new BsonDocument()).ToList())
         {
-            if (person.Username == "adminUser")
-            {
-                foreach (var databaseParcel in mongo.collectionParcels.Find(new BsonDocument()).ToList())
-                {
-                    if (databaseParcel.Status == ParcelStatus.Delivered)
-                    {
-                        parcels.Add(ParcelStatus.Delivered, databaseParcel);
-                    }
-                    else if (databaseParcel.Status == ParcelStatus.InTransport)
-                    {
-                        parcels.Add(ParcelStatus.InTransport, databaseParcel);
-                    }
-                    else if (databaseParcel.Status == ParcelStatus.InWarehouse)
-                    {
-                        parcels.Add(ParcelStatus.InWarehouse, databaseParcel);
-                    }
-                }
-            }
-            else
-            {
-                foreach (var databaseParcel in mongo.collectionParcels.Find(new BsonDocument()).ToList())
-                {
-                    if (databaseParcel.Recipient.Username == person.Username ||
-                        databaseParcel.Sender.Username == person.Username)
-                    {
-                        if (databaseParcel.Status == ParcelStatus.Delivered)
-                        {
-                            parcels.Add(ParcelStatus.Delivered, databaseParcel);
-                        }
-                        else if (databaseParcel.Status == ParcelStatus.InTransport)
-                        {
-                            parcels.Add(ParcelStatus.InTransport, databaseParcel);
-                        }
-                        else if (databaseParcel.Status == ParcelStatus.InWarehouse)
-                        {
-                            parcels.Add(ParcelStatus.InWarehouse, databaseParcel);
-                        }
-                    }
-                }
-            }
+            parcels.Add(databaseParcel.Id, databaseParcel);    
         }
-        return parcels.OrderBy(kvp => kvp.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        
+        return parcels;
     }
 
     /// <summary>

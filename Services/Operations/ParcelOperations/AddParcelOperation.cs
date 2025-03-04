@@ -12,15 +12,22 @@ public class AddParcelOperation : crudParcels
     public void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "AddParcel";
-        var userParcels = DatabaseSearch.FindParcels(person);
-        if (!userParcels.ContainsValue(parcel))
+        e.Success = true;
+        foreach (var userParcel in person.Parcels)
+        {
+            if (userParcel.ParcelName == parcel.ParcelName)
+            {
+                e.Success = false;
+                break;
+            }
+        }
+
+        if (e.Success)
         {
             mongo.collectionParcels.InsertOne(parcel);
-            e.Success = true;
         }
         else
         {
-            e.Success = false;
             e.Message = $"User: {person.Username} already has a parcel named: {parcel.ParcelName}";
         }
         

@@ -12,7 +12,8 @@ public class AddUserOperation : crudUsers
     public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "AddUser";
-        if (!DatabaseSearch.FindUser(person))
+        var users = DatabaseSearch.FindUsers();
+        if (!users.ContainsKey(person.Username))
         {
             person.Password = DatabaseSearch.HashPassword(person.Password);
             mongo.collectionUsers.InsertOne(person);
