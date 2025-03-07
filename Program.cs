@@ -359,19 +359,12 @@ internal class Program
         MongoDBService mongo = ConnectToDatabase();
         DatabaseSearch.mongo = mongo;
         
-        // Operations
-        AddUserOperation addUser = new AddUserOperation();
-        addUser.Notify += EventListener.OnUserOperation;
-        ShowUserOperation showUser = new ShowUserOperation();
-        showUser.Notify += EventListener.OnUserOperation;
-        UpdateUserOperation updateUser = new UpdateUserOperation();
-        updateUser.Notify += EventListener.OnUserOperation;
-        DeleteUserOperation deleteUser = new DeleteUserOperation();
-        deleteUser.Notify += EventListener.OnUserOperation;
-        
+        // User operations
+        UserBase addUser = new AddUserOperation();
+        addUser.Notify += (sender, person, e) => EventListener.OnUserOperation(sender, person, e);
         
         // Log in and show menu
-        PersonModel loggedIn = LogIn(mongo);
-        ShowMenu(loggedIn, mongo);
+        //PersonModel loggedIn = LogIn(mongo);
+        //ShowMenu(loggedIn, mongo);
     }
 }

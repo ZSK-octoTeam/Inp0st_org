@@ -6,11 +6,9 @@ using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
-public class ShowParcelsOperation : crudUsers
+public class ShowParcelsOperation : UserBase
 {
-    public event MongoDBUserOperationHandler Notify;
-    
-    public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "Show parcels";
         e.Message += "Showing parcels: ";
@@ -22,6 +20,6 @@ public class ShowParcelsOperation : crudUsers
             }
         }
         e.Success = true;
-        Notify?.Invoke(this, person, e);
+        OnNotify(this, person, e);
     }
 }

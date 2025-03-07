@@ -4,11 +4,9 @@ using Inpost_org.Users;
 
 namespace Inpost_org.Services.Operations.ParcelOperations;
 
-public class ShowParcelOperation : crudParcels
+public class ShowParcelOperation : ParcelBase
 {
-    public event MongoDBParcelOperationHandler Notify;
-    
-    public void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "ShowParcel";
         e.Success = true;
@@ -36,6 +34,6 @@ public class ShowParcelOperation : crudParcels
             e.Message += $"User: {person.Username} does not have a parcel called: {parcel.ParcelName}\n";
         }
         
-        Notify?.Invoke(this, parcel, person, e);
+        OnNotify(this, parcel, person, e);
     }
 }

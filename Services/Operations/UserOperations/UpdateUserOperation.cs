@@ -4,15 +4,9 @@ using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
-public class UpdateUserOperation : crudUsers
+public class UpdateUserOperation : UserBase
 {
-    public bool Success { get; private set; }
-    public string Message { get; private set; }
-    
-    
-    public event MongoDBUserOperationHandler Notify;
-
-    public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "UpdateUser";
         var users = DatabaseSearch.FindUsers();
@@ -29,6 +23,6 @@ public class UpdateUserOperation : crudUsers
             e.Message = "User does not exist.";
         }
 
-        Notify?.Invoke(this, person, e);
+        OnNotify(this, person, e);
     }
 }

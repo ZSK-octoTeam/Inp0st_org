@@ -5,11 +5,9 @@ using MongoDB.Driver.Linq;
 
 namespace Inpost_org.Services.Operations.ParcelOperations;
 
-public class AddParcelOperation : crudParcels
+public class AddParcelOperation : ParcelBase
 {
-    public event MongoDBParcelOperationHandler Notify;
-
-    public void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "AddParcel";
         e.Success = true;
@@ -31,6 +29,6 @@ public class AddParcelOperation : crudParcels
             e.Message = $"User: {person.Username} already has a parcel named: {parcel.ParcelName}";
         }
         
-        Notify?.Invoke(this, parcel, person, e);
+        OnNotify(this, parcel, person, e);
     }
 }

@@ -3,11 +3,9 @@ using Inpost_org.Users;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
-public class ShowUsersOperation : crudUsers
+public class ShowUsersOperation : UserBase
 {
-    public event MongoDBUserOperationHandler Notify;
-    
-    public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "Show users";
         e.Message += "Showing users: ";
@@ -20,6 +18,6 @@ public class ShowUsersOperation : crudUsers
             }
         }
         e.Success = true;
-        Notify?.Invoke(this, person, e);
+        OnNotify(this, person, e);
     }
 }

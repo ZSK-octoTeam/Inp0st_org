@@ -5,11 +5,9 @@ using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.ParcelOperations;
 
-public class DeleteParcelOperation : crudParcels
+public class DeleteParcelOperation : ParcelBase
 {
-    public event MongoDBParcelOperationHandler Notify;
-
-    public void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "DeleteParcel";
         e.Success = true;
@@ -34,6 +32,6 @@ public class DeleteParcelOperation : crudParcels
             e.Message = $"User: {person.Username} already has a parcel named: {parcel.ParcelName}";
         }
         
-        Notify?.Invoke(this, parcel, person, e);
+        OnNotify(this, parcel, person, e);
     }
 }

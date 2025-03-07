@@ -5,13 +5,9 @@ using MongoDB.Bson;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
-public class ShowUserOperation : crudUsers
+public class ShowUserOperation : UserBase
 {
-    public bool Success { get; private set; }
-    public string Message { get; private set; }
-    public event MongoDBUserOperationHandler Notify;
-
-    public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "Show user";
         e.Success = false;
@@ -47,6 +43,6 @@ public class ShowUserOperation : crudUsers
             e.Message = "User does not exist.";
         }
 
-        Notify?.Invoke(this, person, e);
+        OnNotify(this, person, e);
     }
 }

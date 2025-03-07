@@ -5,11 +5,9 @@ using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.ParcelOperations;
 
-public class UpdateParcelOperation : crudParcels
+public class UpdateParcelOperation : ParcelBase
 {
-    public event MongoDBParcelOperationHandler Notify;
-    
-    public void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         
         //repair
@@ -39,6 +37,6 @@ public class UpdateParcelOperation : crudParcels
             e.Message = $"User: {person.Username} does not have a parcel called: {parcel.ParcelName}\n";
         }
             
-        Notify?.Invoke(this, parcel, person, e);
+        OnNotify(this, parcel, person, e);
     }    
 }

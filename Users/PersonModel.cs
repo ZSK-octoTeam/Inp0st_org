@@ -28,6 +28,14 @@ public class PersonModel
         Roles = new List<Role>();
         Parcels = new List<ParcelModel>();
     }
+
+    public void AddParcel(ParcelModel parcel)
+    {
+        if (!Parcels.Contains(parcel))
+        {
+            Parcels.Add(parcel);
+        }
+    }
     
     public void AddRole(Role role)
     {
