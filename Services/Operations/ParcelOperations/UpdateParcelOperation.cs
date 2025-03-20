@@ -36,7 +36,7 @@ public class UpdateParcelOperation : ParcelBase
         {
             e.Message = $"User: {person.Username} does not have a parcel called: {parcel.ParcelName}\n";
         }
-            
-        OnNotify(this, parcel, person, e);
+
+        OnNotify(parcel, person, e);
     }    
 }

@@ -15,6 +15,8 @@ public class ShowUserOperation : UserBase
         
         if (users.ContainsKey(person.Username))
         {
+            e.Success = true;
+            
             person = users[person.Username];
             
             var rbac = new RBAC();
@@ -43,6 +45,6 @@ public class ShowUserOperation : UserBase
             e.Message = "User does not exist.";
         }
 
-        OnNotify(this, person, e);
+        OnNotify(person, e);
     }
 }

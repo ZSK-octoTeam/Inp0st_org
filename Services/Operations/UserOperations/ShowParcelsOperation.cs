@@ -20,6 +20,7 @@ public class ShowParcelsOperation : UserBase
             }
         }
         e.Success = true;
-        OnNotify(this, person, e);
+
+        OnNotify(person, e);
     }
 }

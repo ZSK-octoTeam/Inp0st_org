@@ -350,8 +350,6 @@ internal class Program
         deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
         return;
     }
-
-
     
     public static void Main(string[] args)
     {
@@ -360,8 +358,26 @@ internal class Program
         DatabaseSearch.mongo = mongo;
         
         // User operations
+        PersonModel sigma = new PersonModel("sigma2","balls");
+        sigma.AddRole(Role.InpostClient);
+
         UserBase addUser = new AddUserOperation();
-        addUser.Notify += (sender, person, e) => EventListener.OnUserOperation(sender, person, e);
+        addUser.Notify += EventListener.OnUserOperation;
+        
+        addUser.Operation(mongo, sigma, new MongoDBOperationEventArgs());
+        addUser.Operation(mongo, sigma, new MongoDBOperationEventArgs());
+        
+        UserBase showUser = new ShowUserOperation();
+        showUser.Notify += EventListener.OnUserOperation;
+        
+        showUser.Operation(mongo, sigma, new MongoDBOperationEventArgs());
+        
+        UserBase delUser = new DeleteUserOperation();
+        delUser.Notify += EventListener.OnUserOperation;
+        
+        delUser.Operation(mongo, sigma, new MongoDBOperationEventArgs());
+        delUser.Operation(mongo, sigma, new MongoDBOperationEventArgs());
+        showUser.Operation(mongo, sigma, new MongoDBOperationEventArgs());
         
         // Log in and show menu
         //PersonModel loggedIn = LogIn(mongo);

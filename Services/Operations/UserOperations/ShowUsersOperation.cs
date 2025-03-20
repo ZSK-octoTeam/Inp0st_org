@@ -18,6 +18,7 @@ public class ShowUsersOperation : UserBase
             }
         }
         e.Success = true;
-        OnNotify(this, person, e);
+        
+        OnNotify(person, e);
     }
 }

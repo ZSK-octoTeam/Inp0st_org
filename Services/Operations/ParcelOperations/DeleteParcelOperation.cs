@@ -31,7 +31,7 @@ public class DeleteParcelOperation : ParcelBase
             e.Success = false;
             e.Message = $"User: {person.Username} already has a parcel named: {parcel.ParcelName}";
         }
-        
-        OnNotify(this, parcel, person, e);
+
+        OnNotify(parcel, person, e);
     }
 }
