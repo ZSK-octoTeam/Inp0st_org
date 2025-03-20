@@ -20,10 +20,9 @@ public class ParcelModel
     public PersonModel Recipient { get; set; }
     public ParcelStatus Status { get; set; }
     
-    public ParcelModel(string parcelName, PersonModel sender, PersonModel recipient)
+    public ParcelModel(string parcelName, PersonModel recipient)
     {
         ParcelName = parcelName;
-        Sender = sender;
         Recipient = recipient;
         Status = ParcelStatus.InWarehouse;
     }
@@ -31,5 +30,10 @@ public class ParcelModel
     public void ChangeStatus(ParcelStatus newStatus)
     {
         Status = newStatus;
+    }
+
+    public void ChangeSender(PersonModel newSender)
+    {
+        Sender = newSender;
     }
 }

@@ -11,9 +11,9 @@ public class AddParcelOperation : ParcelBase
     {
         e.Operation = "AddParcel";
         e.Success = true;
-        foreach (var userParcel in person.Parcels)
+        foreach (var userParcel in DatabaseSearch.FindParcels())
         {
-            if (userParcel.ParcelName == parcel.ParcelName)
+            if (userParcel.Key == parcel.ParcelName && userParcel.Value.Recipient.Username == person.Username)
             {
                 e.Success = false;
                 break;

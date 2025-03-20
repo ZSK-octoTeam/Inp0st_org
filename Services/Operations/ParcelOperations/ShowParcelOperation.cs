@@ -10,11 +10,11 @@ public class ShowParcelOperation : ParcelBase
     {
         e.Operation = "ShowParcel";
         e.Success = true;
-        foreach (var userParcel in person.Parcels)
+        foreach (var userParcel in DatabaseSearch.FindParcels())
         {
-            if (userParcel.ParcelName == parcel.ParcelName)
+            if (userParcel.Key == parcel.ParcelName && userParcel.Value.Recipient.Username == person.Username)
             {
-                parcel = userParcel;
+                parcel = userParcel.Value;
                 e.Success = false;
                 break;
             }
@@ -25,8 +25,15 @@ public class ShowParcelOperation : ParcelBase
            e.Success = true;
            e.Message += $"Parcel name: {parcel.ParcelName}\n";
            e.Message += $"Parcel status: {parcel.Status}\n";
-           e.Message += $"Parcel deliverer {parcel.Sender}\n";
-           e.Message += $"Parcel owner {parcel.Recipient}\n";
+           e.Message += $"Parcel owner: {parcel.Recipient.Username}\n";
+           if (parcel.Sender == null)
+           {
+               e.Message += $"Parcel deliverer: none\n";
+           }
+           else
+           {
+               e.Message += $"Parcel deliverer: {parcel.Sender.Username}\n";
+           }
         }
         else
         {

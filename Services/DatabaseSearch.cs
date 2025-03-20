@@ -37,7 +37,7 @@ public class DatabaseSearch
         Dictionary<string ,ParcelModel> parcels = new Dictionary<string, ParcelModel>();
         foreach (var databaseParcel in mongo.collectionParcels.Find(new BsonDocument()).ToList())
         {
-            parcels.Add(databaseParcel.Id, databaseParcel);    
+            parcels.Add(databaseParcel.ParcelName, databaseParcel);    
         }
         
         return parcels;
