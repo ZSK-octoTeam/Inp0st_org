@@ -23,6 +23,6 @@ public class AddUserOperation : UserBase
             e.Message = "User already exists.";
         }
 
-        OnNotify(this, person, e);
+        OnNotify(person, e);
     }
 }

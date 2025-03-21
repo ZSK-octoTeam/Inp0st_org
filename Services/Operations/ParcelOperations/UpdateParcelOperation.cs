@@ -13,9 +13,9 @@ public class UpdateParcelOperation : ParcelBase
         //repair
         e.Operation = "UpdateParcel";
         e.Success = false;
-        foreach (var userParcel in person.Parcels)
+        foreach (var userParcel in DatabaseSearch.FindParcels())
         {
-            if (parcel.Id == userParcel.Id)
+            if (userParcel.Key == parcel.ParcelName && userParcel.Value.Recipient.Username == person.Username)
             {
                 e.Success = true;
                 break;
@@ -26,8 +26,6 @@ public class UpdateParcelOperation : ParcelBase
         {
             var filter = Builders<ParcelModel>.Filter.Eq(r => r.Id, parcel.Id);
             var update = Builders<ParcelModel>.Update
-                .Set(r => r.ParcelName, parcel.ParcelName)
-                .Set(r => r.Recipient, parcel.Recipient)
                 .Set(r => r.Sender, parcel.Sender)
                 .Set(r => r.Status, parcel.Status);
             mongo.collectionParcels.UpdateOne(filter, update);
@@ -36,7 +34,7 @@ public class UpdateParcelOperation : ParcelBase
         {
             e.Message = $"User: {person.Username} does not have a parcel called: {parcel.ParcelName}\n";
         }
-            
-        OnNotify(this, parcel, person, e);
+
+        OnNotify(parcel, person, e);
     }    
 }

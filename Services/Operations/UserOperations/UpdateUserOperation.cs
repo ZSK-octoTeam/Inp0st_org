@@ -22,7 +22,7 @@ public class UpdateUserOperation : UserBase
             e.Success = false;
             e.Message = "User does not exist.";
         }
-
-        OnNotify(this, person, e);
+    
+        OnNotify(person, e);
     }
 }

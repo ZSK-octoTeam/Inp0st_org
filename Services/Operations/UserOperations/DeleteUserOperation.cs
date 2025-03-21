@@ -10,7 +10,7 @@ public class DeleteUserOperation : UserBase
     {
         e.Operation = "DeleteUser";
         var users = DatabaseSearch.FindUsers();
-        if (!users.ContainsKey(person.Username))
+        if (users.ContainsKey(person.Username))
         {
             var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
             mongo.collectionUsers.DeleteOne(filter);
@@ -22,6 +22,6 @@ public class DeleteUserOperation : UserBase
             e.Message = "User does not exist.";
         }
 
-        OnNotify(this, person, e);
+        OnNotify(person, e);
     }
 }

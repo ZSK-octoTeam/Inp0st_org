@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="@datacluster.kcry9.mongodb.net" uuid="698cf9cb-5c86-4532-b4f1-5470fb1a79ff">
+    <data-source source="LOCAL" name="Inpost_org" uuid="56a851fa-c965-476d-b7d8-326f8fedd04c">
       <driver-ref>mongo.4</driver-ref>
       <synchronize>true</synchronize>
       <configured-by-url>true</configured-by-url>
       <jdbc-driver>com.dbschema.MongoJdbcDriver</jdbc-driver>
-      <jdbc-url>mongodb+srv://guc10:maslo@datacluster.kcry9.mongodb.net/?retryWrites=true&amp;w=majority&amp;appName=dataCluster</jdbc-url>
+      <jdbc-url>mongodb+srv://DatabaseAdmin:maslo@datacluster.kcry9.mongodb.net/?retryWrites=true&amp;w=majority&amp;appName=dataCluster</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

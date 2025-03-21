@@ -10,28 +10,26 @@ public class DeleteParcelOperation : ParcelBase
     public override void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "DeleteParcel";
-        e.Success = true;
-        foreach (var userParcel in person.Parcels)
+        e.Success = false;
+        foreach (var userParcel in DatabaseSearch.FindParcels())
         {
-            if (userParcel.ParcelName == parcel.ParcelName)
+            if (userParcel.Key == parcel.ParcelName && userParcel.Value.Recipient.Username == person.Username)
             {
-                e.Success = false;
+                e.Success = true;
                 break;
             }
         }
 
-        if (!e.Success)
+        if (e.Success)
         {
             var filter = Builders<ParcelModel>.Filter.Eq(r => r.ParcelName, parcel.ParcelName);
             mongo.collectionParcels.DeleteOne(filter);
-            e.Success = true;
         }
         else
         {
-            e.Success = false;
-            e.Message = $"User: {person.Username} already has a parcel named: {parcel.ParcelName}";
+            e.Message = $"User: {person.Username} doesnt have a parcel named: {parcel.ParcelName}";
         }
-        
-        OnNotify(this, parcel, person, e);
+
+        OnNotify(parcel, person, e);
     }
 }

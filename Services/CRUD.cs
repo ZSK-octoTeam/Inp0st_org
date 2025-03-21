@@ -6,17 +6,11 @@ namespace Inpost_org.Services;
 
 public abstract class UserBase
 {
+    public event MongoDBUserOperationHandler Notify;
 
-    private event MongoDBUserOperationHandler _notify;
-    public event MongoDBUserOperationHandler Notify
+    protected void OnNotify(PersonModel person, MongoDBOperationEventArgs e)
     {
-        add => _notify += value;
-        remove => _notify -= value;
-    }
-
-    protected void OnNotify(object sender, PersonModel person, MongoDBOperationEventArgs e)
-    {
-        _notify?.Invoke(sender, person, e);
+        Notify?.Invoke(this, person, e);
     }
     
     public abstract void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e);
@@ -24,16 +18,10 @@ public abstract class UserBase
 
 public abstract class ParcelBase
 {
-    private event MongoDBParcelOperationHandler _notify;
-    public event MongoDBParcelOperationHandler Notify
+    public event MongoDBParcelOperationHandler Notify;
+    protected void OnNotify(ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
-        add => _notify += value;
-        remove => _notify -= value;
-    }
-
-    protected void OnNotify(object sender, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
-    {
-        _notify?.Invoke(sender, parcel, person, e);
+        Notify?.Invoke(this, parcel, person, e);
     }
     
     public abstract void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e);

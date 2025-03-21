@@ -5,10 +5,16 @@ using MongoDB.Bson;
 
 namespace Inpost_org.Services;
 
+public interface IMongoDBService
+{
+    public void SetUser(string databaseUser, string databasePassword);
+    public bool Connect();
+}
+
 /// <summary>
 /// Service class for MongoDB operations.
 /// </summary>
-public class MongoDBService
+public class MongoDBService : IMongoDBService
 {
     private string _connectionString;
     private MongoClient _client;
