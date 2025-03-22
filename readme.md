@@ -21,14 +21,20 @@ This is a console application for managing clients, deliverers, and packages usi
     cd Inpost_org
     ```
 
-3. **Build the Docker image:**
+3. **Create a .env file in root directory with the necessary environment variables:**
+   ```sh
+   DATABASE_USER=your_database_user
+   DATABASE_PASSWORD=your_database_password
+   ```
+
+4. **Build the Docker image:**
     ```sh
-    docker build -t inpost_org .
+    docker build -t inpost_org_image .
     ```
 
-4. **Run the Docker container:**
+5. **Run the Docker container:**
     ```sh
-    docker run -it inpost_org
+    docker run -it --name inpost_org_container --env-file .env inpost_org_image
     ```
 
 ## Usage
