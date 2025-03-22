@@ -9,26 +9,24 @@ This is a console application for managing clients, deliverers, and packages usi
 
 ## Getting Started
 
-### Running the Application Locally
+### Running the Application with Docker
 
 1. **Clone the repository:**
     ```sh
     git clone https://github.com/ZSK-octoTeam/Inpost_org.git
     ```
 
-### Running the Application with Docker
-
-1. **Enter the project directory:**
+2. **Enter the project directory:**
     ```sh
     cd Inpost_org
     ```
 
-2. **Build the Docker image:**
+3. **Build the Docker image:**
     ```sh
     docker build -t inpost_org .
     ```
 
-3. **Run the Docker container:**
+4. **Run the Docker container:**
     ```sh
     docker run -it inpost_org
     ```
