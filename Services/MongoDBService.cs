@@ -49,7 +49,6 @@ public class MongoDBService : IMongoDBService
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Missing database user credentials file !!!");
             Console.WriteLine(ex.Message);
             System.Environment.Exit(-1);
         }
