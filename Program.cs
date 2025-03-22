@@ -59,25 +59,6 @@ internal class Program
             return null;
     }
     
-    public static MongoDBService ConnectToDatabase()
-    {
-        string username = GetInputString("Enter database user:");
-        string passphrase = GetInputString("Enter database user passphrase:");
-        
-        MongoDBService mongo = new MongoDBService(username, passphrase);
-        
-        while (!mongo.Connect())
-        {
-            Console.WriteLine("Connection failed. Try again.");
-            username = GetInputString("Enter database user:");
-            passphrase = GetInputString("Enter database user passphrase:");
-            mongo.SetUser(username, passphrase);
-        }
-        
-        Console.WriteLine("Connection successful.");
-        return mongo;
-    }
-    
     public static void ShowMenu(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
@@ -354,7 +335,8 @@ internal class Program
     public static void Main(string[] args)
     {
         // Database
-        MongoDBService mongo = ConnectToDatabase();
+        MongoDBService mongo = new MongoDBService();
+        mongo.Connect();
         DatabaseSearch.mongo = mongo;
 
         // Log in and show menu
