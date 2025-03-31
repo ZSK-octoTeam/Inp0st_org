@@ -29,34 +29,33 @@ internal class Program
         return input;
     }
     
-    public static PersonModel LogIn(MongoDBService mongo)
+    public static PersonModel LogIn()
     {
-            string username = GetInputString("Enter your username:");
-            string password = GetInputString("Enter your password:");
+        string username = GetInputString("Enter your username:");
+        string password = GetInputString("Enter your password:");
+    
+        PersonModel person = new PersonModel(username, password);
         
-            PersonModel person = new PersonModel(username, password);
-        
-            foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
+        foreach (var databasePerson in DatabaseSearch.FindUsers())
+        {
+            if (databasePerson.Key == person.Username)
             {
-                if (databasePerson.Username == person.Username)
+                if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Value.Password)
                 {
-                    if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Password)
-                    {
-                        Console.WriteLine("Log in successful.");
-                        return person;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Log in failed. Wrong password.");
-                        LogIn(mongo);
-                        return null;
-                    }
-                
+                    Console.WriteLine("Log in successful.");
+                    return person;
                 }
+                else
+                {
+                    Console.WriteLine("Log in failed. Wrong password.");
+                    LogIn();
+                }
+            
             }
-            Console.WriteLine("Log in failed. User not found.");
-            LogIn(mongo);
-            return null;
+        }
+        Console.WriteLine("Log in failed. User not found.");
+        LogIn();
+        return null;
     }
     
     public static void ShowMenu(PersonModel loggedIn, MongoDBService mongo)
@@ -85,7 +84,7 @@ internal class Program
                 case 4:
                     Console.Clear();
                     Console.WriteLine($"Logged out successfully.");
-                    LogIn(mongo);
+                    LogIn();
                     break;
                 case 5:
                     Environment.Exit(0);
@@ -339,8 +338,11 @@ internal class Program
         mongo.Connect();
         DatabaseSearch.mongo = mongo;
 
+        UserBase add = new AddUserOperation();
+        add.Notify += EventListener.OnUserOperation;
+        
         // Log in and show menu
-        //PersonModel loggedIn = LogIn(mongo);
-        //ShowMenu(loggedIn, mongo);
+        PersonModel loggedIn = LogIn();
+        ShowMenu(loggedIn, mongo);
     }
 }
