@@ -8,7 +8,7 @@ namespace Inpost_org.Services.Operations.UserOperations;
 
 public class ShowParcelsOperation : UserBase
 {
-    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e, string role)
     {
         e.Operation = "Show parcels";
         e.Message += "Showing parcels: \n";
