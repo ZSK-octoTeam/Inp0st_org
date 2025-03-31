@@ -5,23 +5,27 @@ namespace Inpost_org.Services.Operations.UserOperations;
 
 public class ShowUsersOperation : UserBase
 {
-    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e, string role)
     {
         e.Operation = "Show users";
         e.Message += "Showing users: \n";
         foreach (var user in DatabaseSearch.FindUsers())
         {
-            e.Message += $"- {user.Key} - roles: \n";
-            if (user.Value.Roles.Count == 0)
+            string wynik = string.Join(", ", user.Value.Roles.Select(e => e.ToString()));
+            if (wynik.Contains(role))
             {
-                e.Message += $"- 'none'\n";
-            }
-            else
-            {
-                foreach (var role in user.Value.Roles)
+                e.Message += $"- {user.Key} - roles: \n";
+                if (user.Value.Roles.Count == 0)
                 {
-                    e.Message += $"- '{role}'\n";
-                }   
+                    e.Message += $"- 'none'\n";
+                }
+                else
+                {
+                    foreach (var r in user.Value.Roles)
+                    {
+                        e.Message += $"- '{r}'\n";
+                    }
+                }
             }
         }
         e.Success = true;

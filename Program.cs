@@ -15,6 +15,11 @@ internal class Program
         string input;
         Console.WriteLine(prompt);
         input = Console.ReadLine();
+        while (String.IsNullOrEmpty(input))
+        {
+            Console.WriteLine("Invalid input. Please enter a correct string:");
+            input = Console.ReadLine();
+        }
         return input;
     }
     
@@ -126,10 +131,10 @@ internal class Program
                     DeleteClient(mongo);
                     break;
                 case 4:
-                    //UpdateClient();
+                    UpdateClient(mongo);
                     break;
                 case 5:
-                    //SearchClient();
+                    SearchClient(mongo);
                     break;
                 case 6:
                     ShowMenu(loggedIn, mongo);
@@ -170,10 +175,10 @@ internal class Program
                     DeleteDeliverer(mongo);
                     break;
                 case 4:
-                    //UpdateDeliverer();
+                    UpdateDeliverer(mongo);
                     break;
                 case 5:
-                    //SearchDeliverer();
+                    SearchDeliverer(mongo);
                     break;
                 case 6:
                     ShowMenu(loggedIn, mongo);
@@ -252,8 +257,8 @@ internal class Program
                 case 2:
                     Console.Clear();
                     Console.WriteLine($"Logged out successfully.");
-                    loggedIn = LogIn(mongo);
-                    ChooseMenu(loggedIn, mongo);
+                    loggedIn = LogIn();
+                    ShowMenu(loggedIn, mongo);
                     break;
                 case 3:
                     Environment.Exit(0);
@@ -397,31 +402,16 @@ internal class Program
         Console.WriteLine("=== CLIENTS ===");
         ShowUsersOperation showUsers = new ShowUsersOperation();
         showUsers.Notify += EventListener.OnUserOperation;
-        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs());
+        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostClient");
     }
 
-    public static void AddClient(MongoDBService mongo){
+    public static void AddClient(MongoDBService mongo)
+    {
         Console.WriteLine("=== ADD CLIENT ===");
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
         PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
-        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-        {
-            if (databasePerson.Username == addedUser.Username)
-            {
-                if(!databasePerson.Roles.Contains(Role.InpostClient))
-                {
-                    databasePerson.AddRole(Role.InpostClient);
-                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
-                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
-                    mongo.collectionUsers.UpdateOne(filter, update);
-                    Console.WriteLine("Added role client to user.");
-                    return;
-                }
-            }
-        }
-        addedUser.AddRole(Role.InpostClient);
-        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs());
+        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostClient");
     }
 
     public static void DeleteClient(MongoDBService mongo){
@@ -429,40 +419,32 @@ internal class Program
         DeleteUserOperation deleteUser = new DeleteUserOperation();
         deleteUser.Notify += EventListener.OnUserOperation;
         PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
-        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-        {
-            if (databasePerson.Username == deletedUser.Username)
-            {
-                if(databasePerson.Roles.Contains(Role.InpostClient))
-                {
-                    databasePerson.Roles.Remove(Role.InpostClient);
-                }
-                else
-                {
-                    Console.WriteLine("User is not a client.");
-                    return;
-                }
+        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs(), "InpostClient");
+    }
 
-                if(databasePerson.Roles.Count != 0)
-                {
-                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
-                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
-                    mongo.collectionUsers.UpdateOne(filter, update);
-                    System.Console.WriteLine("Deleted role client from user.");
-                    return;
-                    
-                }
-            }
-        }
-        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
-        return;
+    public static void UpdateClient(MongoDBService mongo)
+    {
+        Console.WriteLine("=== UPDATE CLIENT ===");
+        UpdateUserOperation updateUser = new UpdateUserOperation();
+        updateUser.Notify += EventListener.OnUserOperation;
+        PersonModel updatedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter new password:"));
+        updateUser.Operation(mongo, updatedUser, new MongoDBOperationEventArgs(), "InpostClient");
+    }
+
+    public static void SearchClient(MongoDBService mongo)
+    {
+        Console.WriteLine("=== SEARCH CLIENT ===");
+        ShowUserOperation showClient = new ShowUserOperation();
+        showClient.Notify += EventListener.OnUserOperation;
+        PersonModel searchedDeliverer = new PersonModel(GetInputString("Enter username: "), "");
+        showClient.Operation(mongo, searchedDeliverer, new MongoDBOperationEventArgs(), "InpostClient");
     }
 
     public static void ShowDeliverers(PersonModel loggedIn,MongoDBService mongo){
         Console.WriteLine("=== DELIVERERS ===");
         ShowUsersOperation showUsers = new ShowUsersOperation();
         showUsers.Notify += EventListener.OnUserOperation;
-        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs());
+        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostEmployee");
     }
 
     public static void AddDeliverer(MongoDBService mongo){
@@ -470,23 +452,7 @@ internal class Program
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
         PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
-        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-        {
-            if (databasePerson.Username == addedUser.Username)
-            {
-                if(!databasePerson.Roles.Contains(Role.InpostEmployee))
-                {
-                    databasePerson.AddRole(Role.InpostEmployee);
-                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
-                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
-                    mongo.collectionUsers.UpdateOne(filter, update);
-                    Console.WriteLine("Added role deliverer to user.");
-                    return;
-                }
-            }
-        }
-        addedUser.AddRole(Role.InpostEmployee);
-        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs());
+        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostEmployee");
     }
 
     public static void DeleteDeliverer(MongoDBService mongo){
@@ -494,33 +460,25 @@ internal class Program
         DeleteUserOperation deleteUser = new DeleteUserOperation();
         deleteUser.Notify += EventListener.OnUserOperation;
         PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
-        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-        {
-            if (databasePerson.Username == deletedUser.Username)
-            {
-                if(databasePerson.Roles.Contains(Role.InpostEmployee))
-                {
-                    databasePerson.Roles.Remove(Role.InpostEmployee);
-                }
-                else
-                {
-                    Console.WriteLine("User is not a deliverer.");
-                    return;
-                }
+        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs(), "InpostEmployee");
+    }
 
-                if(databasePerson.Roles.Count != 0)
-                {
-                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
-                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
-                    mongo.collectionUsers.UpdateOne(filter, update);
-                    Console.WriteLine("Deleted role deliverer from user.");
-                    return;
-                    
-                }
-            }   
-        }
-        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
-        return;
+    public static void UpdateDeliverer(MongoDBService mongo)
+    {
+        Console.WriteLine("=== UPDATE DELIVERER ===");
+        UpdateUserOperation updateDeliverer = new UpdateUserOperation();
+        updateDeliverer.Notify += EventListener.OnUserOperation;
+        PersonModel updatedDeliverer = new PersonModel(GetInputString("Enter username: "), GetInputString("Enter new password: "));
+        updateDeliverer.Operation(mongo, updatedDeliverer, new MongoDBOperationEventArgs(), "InpostEmployee");
+    }
+
+    public static void SearchDeliverer(MongoDBService mongo)
+    {
+        Console.WriteLine("=== SEARCH DELIVERER ===");
+        ShowUserOperation showDeliverer = new ShowUserOperation();
+        showDeliverer.Notify += EventListener.OnUserOperation;
+        PersonModel searchedDeliverer = new PersonModel(GetInputString("Enter username: "), "");
+        showDeliverer.Operation(mongo, searchedDeliverer, new MongoDBOperationEventArgs(), "InpostEmployee");
     }
     
     public static void Main(string[] args)

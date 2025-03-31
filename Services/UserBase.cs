@@ -13,7 +13,7 @@ public abstract class UserBase
         Notify?.Invoke(this, person, e);
     }
     
-    public abstract void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e);
+    public abstract void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e, string role);
 }
 
 public abstract class ParcelBase
