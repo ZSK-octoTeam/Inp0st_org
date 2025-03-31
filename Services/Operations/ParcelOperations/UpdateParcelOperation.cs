@@ -5,27 +5,36 @@ using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.ParcelOperations;
 
-public class UpdateParcelOperation : crudParcels
+public class UpdateParcelOperation : ParcelBase
 {
-    public event MongoDBParcelOperationHandler Notify;
-    
-    public void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
+        
+        //repair
         e.Operation = "UpdateParcel";
-        var userParcels = DatabaseSearch.FindParcels(person);
-        if (userParcels.ContainsValue(parcel))
+        e.Success = false;
+        foreach (var userParcel in DatabaseSearch.FindParcels())
         {
-            var filter = Builders<ParcelModel>.Filter.Eq(r => r.Recipient.Username, person.Username);
-            var update = Builders<ParcelModel>.Update.Set(r => r.Status, parcel.Status);
+            if (userParcel.Key == parcel.ParcelName && userParcel.Value.Recipient.Username == person.Username)
+            {
+                e.Success = true;
+                break;
+            }
+        }
+
+        if (e.Success)
+        {
+            var filter = Builders<ParcelModel>.Filter.Eq(r => r.Id, parcel.Id);
+            var update = Builders<ParcelModel>.Update
+                .Set(r => r.Sender, parcel.Sender)
+                .Set(r => r.Status, parcel.Status);
             mongo.collectionParcels.UpdateOne(filter, update);
-            e.Success = true;
         }
         else
         {
-            e.Success = false;
-            e.Message = $"User: {person.Username} does not have a parcel named: {parcel.ParcelName}";
+            e.Message = $"User: {person.Username} does not have a parcel called: {parcel.ParcelName}\n";
         }
-        
-        Notify?.Invoke(this, parcel, person, e);
+
+        OnNotify(parcel, person, e);
     }    
 }

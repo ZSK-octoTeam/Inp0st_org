@@ -29,54 +29,33 @@ internal class Program
         return input;
     }
     
-    public static PersonModel LogIn(MongoDBService mongo)
+    public static PersonModel LogIn()
     {
-            string username = GetInputString("Enter your username:");
-            string password = GetInputString("Enter your password:");
-        
-            PersonModel person = new PersonModel(username, password);
-        
-            foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-            {
-                if (databasePerson.Username == person.Username)
-                {
-                    if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Password)
-                    {
-                        person = databasePerson;
-                        Console.WriteLine("Log in successful.");
-                        return person;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Log in failed. Wrong password.");
-                        LogIn(mongo);
-                        return null;
-                    }
-                
-                }
-            }
-            Console.WriteLine("Log in failed. User not found.");
-            LogIn(mongo);
-            return null;
-    }
+        string username = GetInputString("Enter your username:");
+        string password = GetInputString("Enter your password:");
     
-    public static MongoDBService ConnectToDatabase()
-    {
-        string username = GetInputString("Enter database user:");
-        string passphrase = GetInputString("Enter database user passphrase:");
+        PersonModel person = new PersonModel(username, password);
         
-        MongoDBService mongo = new MongoDBService(username, passphrase);
-        
-        while (!mongo.Connect())
+        foreach (var databasePerson in DatabaseSearch.FindUsers())
         {
-            Console.WriteLine("Connection failed. Try again.");
-            username = GetInputString("Enter database user:");
-            passphrase = GetInputString("Enter database user passphrase:");
-            mongo.SetUser(username, passphrase);
+            if (databasePerson.Key == person.Username)
+            {
+                if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Value.Password)
+                {
+                    Console.WriteLine("Log in successful.");
+                    return person;
+                }
+                else
+                {
+                    Console.WriteLine("Log in failed. Wrong password.");
+                    LogIn();
+                }
+            
+            }
         }
-        
-        Console.WriteLine("Connection successful.");
-        return mongo;
+        Console.WriteLine("Log in failed. User not found.");
+        LogIn();
+        return null;
     }
     
     public static void ShowMenu(PersonModel loggedIn, MongoDBService mongo)
@@ -109,8 +88,7 @@ internal class Program
                 case 5:
                     Console.Clear();
                     Console.WriteLine($"Logged out successfully.");
-                    loggedIn = LogIn(mongo);
-                    ChooseMenu(loggedIn, mongo);
+                    LogIn();
                     break;
                 case 6:
                     Environment.Exit(0);
@@ -544,24 +522,19 @@ internal class Program
         deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
         return;
     }
-
-    public static void ChooseMenu(PersonModel loggedIn, MongoDBService mongo){
-        if(loggedIn.Roles.Contains(Role.Administrator)){
-            ShowMenu(loggedIn, mongo);
-        }
-        else{
-            ShowNormalMenu(loggedIn, mongo);
-        }
-    }
     
     public static void Main(string[] args)
     {
         // Database
-        MongoDBService mongo = ConnectToDatabase();
+        MongoDBService mongo = new MongoDBService();
+        mongo.Connect();
         DatabaseSearch.mongo = mongo;
+
+        UserBase add = new AddUserOperation();
+        add.Notify += EventListener.OnUserOperation;
         
         // Log in and show menu
-        PersonModel loggedIn = LogIn(mongo);
-        ChooseMenu(loggedIn, mongo);
+        PersonModel loggedIn = LogIn();
+        ShowMenu(loggedIn, mongo);
     }
 }

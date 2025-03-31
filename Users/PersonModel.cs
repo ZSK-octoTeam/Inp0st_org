@@ -1,3 +1,4 @@
+using Inpost_org.Users.Deliveries;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 

@@ -5,25 +5,30 @@ using MongoDB.Driver.Linq;
 
 namespace Inpost_org.Services.Operations.ParcelOperations;
 
-public class AddParcelOperation : crudParcels
+public class AddParcelOperation : ParcelBase
 {
-    public event MongoDBParcelOperationHandler Notify;
-
-    public void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "AddParcel";
-        var userParcels = DatabaseSearch.FindParcels(person);
-        if (!userParcels.ContainsValue(parcel))
+        e.Success = true;
+        foreach (var userParcel in DatabaseSearch.FindParcels())
+        {
+            if (userParcel.Key == parcel.ParcelName && userParcel.Value.Recipient.Username == person.Username)
+            {
+                e.Success = false;
+                break;
+            }
+        }
+
+        if (e.Success)
         {
             mongo.collectionParcels.InsertOne(parcel);
-            e.Success = true;
         }
         else
         {
-            e.Success = false;
             e.Message = $"User: {person.Username} already has a parcel named: {parcel.ParcelName}";
         }
-        
-        Notify?.Invoke(this, parcel, person, e);
+
+        OnNotify(parcel, person, e);
     }
 }

@@ -2,13 +2,20 @@ using Inpost_org.Users;
 using Inpost_org.Users.Deliveries;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using dotenv.net;
 
 namespace Inpost_org.Services;
+
+public interface IMongoDBService
+{
+    public void Connect();
+    public void ListCollections();
+}
 
 /// <summary>
 /// Service class for MongoDB operations.
 /// </summary>
-public class MongoDBService
+public class MongoDBService : IMongoDBService
 {
     private string _connectionString;
     private MongoClient _client;
@@ -16,10 +23,9 @@ public class MongoDBService
     public IMongoCollection<PersonModel> collectionUsers;
     public IMongoCollection<ParcelModel> collectionParcels;
 
-    public string DatabaseName { get; private set; } = "Inpost";
-    public string CollectionNameUsers { get; private set; } = "Users";
-    public string CollectionNameParcels { get; private set; } = "Parcels";
-
+    public string DatabaseName { get; private set; }
+    public string CollectionNameUsers { get; private set; }
+    public string CollectionNameParcels { get; private set; }
     public string DatabaseUser { get; private set; }
     public string DatabasePassword { get; private set; }
     
@@ -28,28 +34,31 @@ public class MongoDBService
     /// </summary>
     /// <param name="databaseUser">Database user name.</param>
     /// <param name="databasePassword">Database user password.</param>
-    public MongoDBService(string databaseUser, string databasePassword)
+    public MongoDBService()
     {
-        SetUser(databaseUser, databasePassword);
-    }
-    
-    ///<summary>
-    /// Sets the database user credentials.
-    /// </summary>
-    /// <param name="databaseUser">Database user name.</param>
-    /// <param name="databasePassword">Database user password.</param>
-    public void SetUser(string databaseUser, string databasePassword)
-    {
-        DatabaseUser = databaseUser;
-        DatabasePassword = databasePassword;
-        _connectionString = $"mongodb+srv://{DatabaseUser}:{DatabasePassword}@datacluster.kcry9.mongodb.net/?retryWrites=true&w=majority&appName=dataCluster";
+        DatabaseName = "Inpost";
+        CollectionNameUsers = "Users";
+        CollectionNameParcels = "Parcels";
+        try
+        {
+            DotEnv.Load();
+            DatabaseUser = Environment.GetEnvironmentVariable("DATABASE_USER");
+            DatabasePassword = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
+            Console.WriteLine($"Database user '{DatabaseUser}' and Password '{DatabasePassword}'");
+            _connectionString = $"mongodb+srv://{DatabaseUser}:{DatabasePassword}@datacluster.kcry9.mongodb.net/?retryWrites=true&w=majority&appName=dataCluster";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            System.Environment.Exit(-1);
+        }
     }
     
     ///<summary>
     /// Connects to the MongoDB database.
     /// </summary>
     /// <returns>True if connection is successful, otherwise false.</returns>
-    public bool Connect()
+    public void Connect()
     {
         try
         {
@@ -61,13 +70,12 @@ public class MongoDBService
             Console.WriteLine("Pinging your deployment...");
             var result = _client.GetDatabase("admin").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
             Console.WriteLine($"Pinged your deployment. You successfully connected to MongoDB! {result}");
-            
-            return true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Could not connect to MongoDB: {ex.Message}");
-            return false;
+            Console.WriteLine("Wrong database user credentials !!!");
+            Console.WriteLine($"Could not connect to MongoDB: the connection string is not valid.");
+            System.Environment.Exit(-1);
         }
     }
 

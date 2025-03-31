@@ -5,14 +5,13 @@ using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
-public class AddUserOperation : crudUsers
+public class AddUserOperation : UserBase
 {
-    public event MongoDBUserOperationHandler Notify;
-
-    public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "AddUser";
-        if (!DatabaseSearch.FindUser(person))
+        var users = DatabaseSearch.FindUsers();
+        if (!users.ContainsKey(person.Username))
         {
             person.Password = DatabaseSearch.HashPassword(person.Password);
             mongo.collectionUsers.InsertOne(person);
@@ -24,6 +23,6 @@ public class AddUserOperation : crudUsers
             e.Message = "User already exists.";
         }
 
-        Notify?.Invoke(this, person, e);
+        OnNotify(person, e);
     }
 }

@@ -6,19 +6,26 @@ using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
-public class ShowParcelsOperation : crudUsers
+public class ShowParcelsOperation : UserBase
 {
-    public event MongoDBUserOperationHandler Notify;
-    
-    public void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "Show parcels";
-        e.Message += "Showing parcels: ";
-        foreach (var parcel in DatabaseSearch.FindParcels(person))
+        e.Message += "Showing parcels: \n";
+        foreach (var databaseParcel in DatabaseSearch.FindParcels())
         {
-            e.Message += $"Parcel name: {parcel.Value.ParcelName}, parcel status: {parcel.Value.Status}, parcel reciver: {person.Username}\n";
+            if (databaseParcel.Value.Recipient.Username == person.Username)
+            {
+                e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, you are reciver\n";
+            }
+
+            if (databaseParcel.Value.Sender.Username == person.Username)
+            {
+                e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, you are sender\n";
+            }
         }
         e.Success = true;
-        Notify?.Invoke(this, person, e);
+
+        OnNotify(person, e);
     }
 }
