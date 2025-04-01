@@ -20,8 +20,7 @@ public class DeleteUserOperation : UserBase
             }
             else
             {
-                users[person.Username].Roles.Remove(Enum.Parse<Role>(role));
-                if (users[person.Username].Roles.Count == 0)
+                if (users[person.Username].Roles.Count == 1 || !Enum.TryParse<Role>(role, out var result))
                 {
                     var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
                     mongo.collectionUsers.DeleteOne(filter);
@@ -29,6 +28,7 @@ public class DeleteUserOperation : UserBase
                 }
                 else
                 {
+                    users[person.Username].Roles.Remove(Enum.Parse<Role>(role));
                     var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
                     var update = Builders<PersonModel>.Update.Set(r => r.Roles, users[person.Username].Roles);
                     mongo.collectionUsers.UpdateOne(filter, update);

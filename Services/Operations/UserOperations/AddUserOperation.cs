@@ -24,14 +24,15 @@ public class AddUserOperation : UserBase
         else
         {
             string wynik = string.Join(", ", person.Roles.Select(e => e.ToString()));
-            if(wynik.Contains(role))
+            if(wynik.Contains(role) || users[person.Username].Roles.Contains(Enum.Parse<Role>(role)))
             {
                 e.Success = false;
                 e.Message = "User already exists.";
             }
             else
             {
-                users[person.Username].AddRole(Enum.Parse<Role>(role));
+                //naprawic bo mozna dodac 2 takie same role
+                users[person.Username].Roles.Add(Enum.Parse<Role>(role));
                 var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
                 var update = Builders<PersonModel>.Update.Set(r => r.Roles, users[person.Username].Roles);
                 mongo.collectionUsers.UpdateOne(filter, update);

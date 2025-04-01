@@ -20,7 +20,7 @@ public class UpdateUserOperation : UserBase
             }
             else
             {
-                if (person.Password == users[person.Username].Password)
+                if (DatabaseSearch.HashPassword(person.Password) == users[person.Username].Password)
                 {
                     e.Success = false; 
                     e.Message = "New password is the same as the old one.";

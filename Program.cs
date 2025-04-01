@@ -48,19 +48,21 @@ internal class Program
                 if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Value.Password)
                 {
                     Console.WriteLine("Log in successful.");
+                    databasePerson.Value.Roles.ForEach(role => person.Roles.Add(role));
                     return person;
                 }
                 else
                 {
                     Console.WriteLine("Log in failed. Wrong password.");
                     LogIn();
+                    return person;
                 }
             
             }
         }
         Console.WriteLine("Log in failed. User not found.");
         LogIn();
-        return null;
+        return person;
     }
     
     public static void ShowMenu(PersonModel loggedIn, MongoDBService mongo)
@@ -312,7 +314,7 @@ internal class Program
         {
             ShowMenu(loggedIn, mongo);
         }
-        else if (loggedIn.Roles.Contains(Role.InpostClient) || loggedIn.Roles.Contains(Role.InpostEmployee))
+        else if (loggedIn.Roles.Contains(Role.InpostClient) && loggedIn.Roles.Contains(Role.InpostEmployee))
         {
             ShowCADMenu(loggedIn, mongo);
         }
@@ -394,7 +396,7 @@ internal class Program
                     //SearchPackage();
                     break;
                 case 5:
-                    ShowNormalMenu(loggedIn, mongo);
+                    ChooseMenu(loggedIn, mongo);
                     break;
                 case 6:
                     Environment.Exit(0);
@@ -438,7 +440,7 @@ internal class Program
                     //SearchPackage();
                     break;
                 case 6:
-                    ShowNormalMenu(loggedIn, mongo);
+                    ChooseMenu(loggedIn, mongo);
                     break;
                 case 7:
                     Environment.Exit(0);
@@ -547,6 +549,15 @@ internal class Program
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
         PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
+        Role r;
+        while(!Enum.TryParse(GetInputString("Enter role:"), out r))
+        {
+            Console.WriteLine("Invalid role. Please enter one of following roles:");
+            Console.WriteLine("-Administrator");
+            Console.WriteLine("-InpostClient");
+            Console.WriteLine("-InpostEmployee");
+        }
+        addedUser.Roles.Add(r);
         addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "");
     }
 
@@ -583,7 +594,6 @@ internal class Program
         MongoDBService mongo = new MongoDBService();
         mongo.Connect();
         DatabaseSearch.mongo = mongo;
-
         // Log in and show menu
         PersonModel loggedIn = LogIn();
         ChooseMenu(loggedIn, mongo);
