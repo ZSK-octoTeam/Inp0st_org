@@ -14,14 +14,9 @@ public class ShowParcelsOperation : UserBase
         e.Message += "Showing parcels: \n";
         foreach (var databaseParcel in DatabaseSearch.FindParcels())
         {
-            if (databaseParcel.Value.Recipient.Username == person.Username)
+            if (databaseParcel.Value.Recipient.Username == person.Username || databaseParcel.Value.Sender.Username == person.Username || person.Roles.Contains(Role.Administrator) || role == "InpostEmployeeAll")
             {
-                e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, you are reciver\n";
-            }
-
-            if (databaseParcel.Value.Sender.Username == person.Username)
-            {
-                e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, you are sender\n";
+                e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, parcel sender: {databaseParcel.Value.Sender.Username}, parcel reciever: {databaseParcel.Value.Recipient.Username}\n";
             }
         }
         e.Success = true;

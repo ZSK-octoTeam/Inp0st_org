@@ -15,24 +15,34 @@ public class UpdateParcelOperation : ParcelBase
         e.Success = false;
         foreach (var userParcel in DatabaseSearch.FindParcels())
         {
-            if (userParcel.Key == parcel.ParcelName && userParcel.Value.Recipient.Username == person.Username)
+            if (userParcel.Key == parcel.ParcelName)
             {
+                if(parcel.Recipient.Username == "")
+                {
+                    parcel.Recipient = userParcel.Value.Recipient;
+                }
                 e.Success = true;
                 break;
             }
         }
 
-        if (e.Success)
+        if(DatabaseSearch.FindUsers().ContainsKey(parcel.Recipient.Username) == false || DatabaseSearch.FindUsers().ContainsKey(parcel.Sender.Username) == false)
+        {
+            e.Success = false;
+            e.Message = $"Recipient or  sender does not exist";
+        }
+        else if (e.Success)
         {
             var filter = Builders<ParcelModel>.Filter.Eq(r => r.Id, parcel.Id);
             var update = Builders<ParcelModel>.Update
                 .Set(r => r.Sender, parcel.Sender)
-                .Set(r => r.Status, parcel.Status);
+                .Set(r => r.Status, parcel.Status)
+                .Set(r => r.Recipient, parcel.Recipient);
             mongo.collectionParcels.UpdateOne(filter, update);
         }
         else
         {
-            e.Message = $"User: {person.Username} does not have a parcel called: {parcel.ParcelName}\n";
+            e.Message = $"Parcel: {parcel.ParcelName} does not exist in the database\n";
         }
 
         OnNotify(parcel, person, e);

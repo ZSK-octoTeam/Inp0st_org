@@ -210,19 +210,19 @@ internal class Program
             switch (choice)
             {
                 case 1:
-                    //AddPackage();
+                    AddPackage(mongo);
                     break;
                 case 2:
-                    //ShowPackage();
+                    ShowPackages(loggedIn, mongo);
                     break;
                 case 3:
-                    //DeletePackage();
+                    DeletePackage(loggedIn, mongo);
                     break;
                 case 4:
-                    //UpdatePackage();
+                    UpdatePackage(loggedIn ,mongo);
                     break;
                 case 5:
-                    //SearchPackage();
+                    SearchPackage(loggedIn, mongo);
                     break;
                 case 6:
                     ShowMenu(loggedIn, mongo);
@@ -384,16 +384,16 @@ internal class Program
             switch (choice)
             {
                 case 1:
-                    //AddPackage();
+                    OrderPackage(loggedIn, mongo);
                     break;
                 case 2:
-                    //ShowMyPackages();
+                    ShowMyPackages(loggedIn, mongo);
                     break;
                 case 3:
-                    //DeletePackage();
+                    DeletePackage(loggedIn, mongo);
                     break;
                 case 4:
-                    //SearchPackage();
+                    SearchPackage(loggedIn, mongo);
                     break;
                 case 5:
                     ChooseMenu(loggedIn, mongo);
@@ -425,19 +425,19 @@ internal class Program
             switch (choice)
             {
                 case 1:
-                    //ShowMyPackages();
+                    ShowMyPackages(loggedIn, mongo);
                     break;
                 case 2:
-                    //ShowAllPackages();
+                    ShowPackages(loggedIn, mongo);
                     break;
                 case 3:
-                    //PickUpPackage();
+                    PickUpPackage(loggedIn, mongo);
                     break;
                 case 4:
-                    //DeliverPackage();
+                    DeliverPackage(loggedIn, mongo);
                     break;
                 case 5:
-                    //SearchPackage();
+                    SearchPackage(loggedIn, mongo);
                     break;
                 case 6:
                     ChooseMenu(loggedIn, mongo);
@@ -588,6 +588,100 @@ internal class Program
         showUser.Operation(mongo, searchedUser, new MongoDBOperationEventArgs(), "");
     }
 
+    public static void ShowPackages(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== PACKAGES ===");
+        ShowParcelsOperation showParcels = new ShowParcelsOperation();
+        showParcels.Notify += EventListener.OnUserOperation;
+        showParcels.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostEmployeeAll");
+    }
+
+    public static void ShowMyPackages(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== MY PACKAGES ===");
+        ShowParcelsOperation showParcels = new ShowParcelsOperation();
+        showParcels.Notify += EventListener.OnUserOperation;
+        showParcels.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "");
+    }
+
+    public static void AddPackage(MongoDBService mongo)
+    {
+        Console.WriteLine("=== ADD PACKAGE ===");
+        AddParcelOperation addParcel = new AddParcelOperation();
+        addParcel.Notify += EventListener.OnParcelOperation;
+        PersonModel personModel = new PersonModel(GetInputString("Enter sender username:"), "");
+        ParcelModel addedParcel = new ParcelModel(GetInputString("Enter parcel name:"), personModel);
+        addParcel.Operation(mongo, addedParcel, personModel ,new MongoDBOperationEventArgs());
+    }
+
+    public static void OrderPackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== ORDER PACKAGE ===");
+        AddParcelOperation addParcel = new AddParcelOperation();
+        addParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel addedParcel = new ParcelModel(GetInputString("Enter parcel name:"), loggedIn);
+        addParcel.Operation(mongo, addedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void DeletePackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== DELETE PACKAGE ===");
+        DeleteParcelOperation deleteParcel = new DeleteParcelOperation();
+        deleteParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel deletedParcel = new ParcelModel(GetInputString("Enter parcel name:"), loggedIn);
+        deleteParcel.Operation(mongo, deletedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void UpdatePackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== UPDATE PACKAGE ===");
+        UpdateParcelOperation updateParcel = new UpdateParcelOperation();
+        updateParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel(GetInputString("Enter new recipient username:"), ""));
+        PersonModel delivererModel = new PersonModel(GetInputString("Enter new deliverer username:"), "");
+        updatedParcel.ChangeSender(delivererModel);
+        ParcelStatus s;
+        while (!Enum.TryParse(GetInputString("Enter new status:"), out s))
+        {
+            Console.WriteLine("Invalid status. Please enter one of following statuses:");
+            Console.WriteLine("-InWarehouse");
+            Console.WriteLine("-InTransport");
+            Console.WriteLine("-Delivered");
+        }
+        updatedParcel.ChangeStatus(s);
+        updateParcel.Operation(mongo, updatedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void PickUpPackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== PICK UP PACKAGE ===");
+        UpdateParcelOperation updateParcel = new UpdateParcelOperation();
+        updateParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel("", ""));
+        updatedParcel.ChangeStatus(ParcelStatus.InTransport);
+        updatedParcel.ChangeSender(loggedIn);
+        updateParcel.Operation(mongo, updatedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void DeliverPackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== DELIVER PACKAGE ===");
+        UpdateParcelOperation updateParcel = new UpdateParcelOperation();
+        updateParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel("", ""));
+        updatedParcel.ChangeStatus(ParcelStatus.Delivered);
+        updatedParcel.ChangeSender(loggedIn);
+        updateParcel.Operation(mongo, updatedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void SearchPackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== SEARCH PACKAGE ===");
+        ShowParcelOperation showParcel = new ShowParcelOperation();
+        showParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel searchedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel("", ""));
+        showParcel.Operation(mongo, searchedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
     public static void Main(string[] args)
     {
         // Database
