@@ -1,15 +1,14 @@
-using System.IO;
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Users;
 using Inpost_org.Users.Deliveries;
 
 namespace Inpost_org.Services.Operations;
 
-public class EventListener
+public class LogManager()
 {
     private static readonly string logFilePath = "event_log.txt";
-
-    private static void LogToFile(MongoDBOperationEventArgs e)
+    
+    protected static void LogToFile(MongoDBOperationEventArgs e)
     {
         string action = e.Success ? "success" : "failure";
         using (StreamWriter writer = new StreamWriter(logFilePath, true))
@@ -17,7 +16,10 @@ public class EventListener
             writer.WriteLine($"Event: {e.Operation}, completed with status: {action} on date: {DateTime.Now}\n");
         }
     }
+}
 
+public class EventListener : LogManager
+{
     public static void OnUserOperation(object sender, PersonModel person, MongoDBOperationEventArgs e)
     {
         string action = e.Success ? "success" : "failure";

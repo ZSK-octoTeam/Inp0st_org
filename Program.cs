@@ -339,13 +339,6 @@ internal class Program
         mongo.Connect();
         DatabaseSearch.mongo = mongo;
 
-        UserBase add = new AddUserOperation();
-        add.Notify += EventListener.OnUserOperation;
-        
-        //Tests
-        Tests.PersonOperationsTest(mongo);
-        Tests.ParcelOperationsTest(mongo);
-        
         // Log in and show menu
         /*
         PersonModel loggedIn = LogIn();
