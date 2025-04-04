@@ -12,20 +12,32 @@ public class ShowParcelsOperation : UserBase
     {
         e.Operation = "Show parcels";
         e.Message += "Showing parcels: \n";
-        foreach (var databaseParcel in DatabaseSearch.FindParcels())
+        var databaseParcels = DatabaseSearch.FindParcels(); 
+        if (person == null)
         {
-            if (databaseParcel.Value.Recipient.Username == person.Username)
+            foreach (var databaseParcel in databaseParcels)
             {
-                e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, you are reciver\n";
+                e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}\n";
             }
 
-            if (databaseParcel.Value.Sender.Username == person.Username)
-            {
-                e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, you are sender\n";
-            }
+            e.Success = true;
         }
-        e.Success = true;
+        else
+        {
+            foreach (var databaseParcel in databaseParcels)
+            {
+                if (databaseParcel.Value.Recipient.Username == person.Username)
+                {
+                    e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, you are reciver\n";
+                }
 
+                if (databaseParcel.Value.Sender.Username == person.Username)
+                {
+                    e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, you are sender\n";
+                }
+            }
+            e.Success = true;
+        }
         OnNotify(person, e);
     }
 }

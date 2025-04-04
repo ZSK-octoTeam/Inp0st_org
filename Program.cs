@@ -3,6 +3,7 @@ using Inpost_org.Services.Operations.UserOperations;
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Services.Operations;
 using Inpost_org.Services;
+using Inpost_org.Tests;
 using Inpost_org.Users.Deliveries;
 using Inpost_org.Users;
 using MongoDB.Driver;
@@ -338,11 +339,10 @@ internal class Program
         mongo.Connect();
         DatabaseSearch.mongo = mongo;
 
-        UserBase add = new AddUserOperation();
-        add.Notify += EventListener.OnUserOperation;
-        
         // Log in and show menu
+        /*
         PersonModel loggedIn = LogIn();
         ShowMenu(loggedIn, mongo);
+        */
     }
 }
