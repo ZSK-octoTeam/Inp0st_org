@@ -7,36 +7,44 @@ namespace Inpost_org.Services.Operations.UserOperations;
 
 public class ShowUserOperation : UserBase
 {
-    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e, string role)
     {
         e.Operation = "Show user";
         e.Success = false;
         var users = DatabaseSearch.FindUsers();
-        
+        string wynik = string.Join(", ", users[person.Username].Roles.Select(e => e.ToString()));
         if (users.ContainsKey(person.Username))
         {
-            e.Success = true;
-            
-            person = users[person.Username];
-            
-            var rbac = new RBAC();
-            
-            e.Operation = "ShowUser";
-            e.Message += $"Username: {person.Username}\n";
-            e.Message += "Roles: \n";
-            
-            foreach (var role in person.Roles)
+            if (wynik.Contains(role))
             {
-                e.Message += $"-{role}\n";
-            }
+                e.Success = true;
 
-            e.Message += "\nHas permission to: \n";            
-            foreach (var permission in Enum.GetValues(typeof(Permission)))
-            {
-                if (rbac.HasPermission(person, (Permission)permission))
+                person = users[person.Username];
+
+                var rbac = new RBAC();
+
+                e.Operation = "ShowUser";
+                e.Message += $"Username: {person.Username}\n";
+                e.Message += "Roles: \n";
+
+                foreach (var r in person.Roles)
                 {
-                    e.Message += $"-{permission}\n";
+                    e.Message += $"-{r}\n";
                 }
+
+                e.Message += "\nHas permission to: \n";
+                foreach (var permission in Enum.GetValues(typeof(Permission)))
+                {
+                    if (rbac.HasPermission(person, (Permission)permission))
+                    {
+                        e.Message += $"-{permission}\n";
+                    }
+                }
+            }
+            else
+            {
+                e.Success = false;
+                e.Message = $"User is not a {role}.";
             }
         }
         else

@@ -13,7 +13,7 @@ public class DeleteParcelOperation : ParcelBase
         e.Success = false;
         foreach (var userParcel in DatabaseSearch.FindParcels())
         {
-            if (userParcel.Key == parcel.ParcelName && userParcel.Value.Recipient.Username == person.Username)
+            if (userParcel.Key == parcel.ParcelName && (userParcel.Value.Recipient.Username == person.Username || person.Roles.Contains(Role.Administrator)))
             {
                 e.Success = true;
                 break;
@@ -24,6 +24,10 @@ public class DeleteParcelOperation : ParcelBase
         {
             var filter = Builders<ParcelModel>.Filter.Eq(r => r.ParcelName, parcel.ParcelName);
             mongo.collectionParcels.DeleteOne(filter);
+        }
+        else if(DatabaseSearch.FindParcels().ContainsKey(parcel.ParcelName) == false)
+        {
+            e.Message = $"Parcel: {parcel.ParcelName} doesnt exist";
         }
         else
         {

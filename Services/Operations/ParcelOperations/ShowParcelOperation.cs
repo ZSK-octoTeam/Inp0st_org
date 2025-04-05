@@ -12,17 +12,21 @@ public class ShowParcelOperation : ParcelBase
         e.Success = true;
         foreach (var userParcel in DatabaseSearch.FindParcels())
         {
-            if (userParcel.Key == parcel.ParcelName && userParcel.Value.Recipient.Username == person.Username)
+            if (userParcel.Key == parcel.ParcelName && (userParcel.Value.Recipient.Username == person.Username || person.Roles.Contains(Role.Administrator) || userParcel.Value.Sender.Username == person.Username))
             {
                 parcel = userParcel.Value;
-                e.Success = false;
+                e.Success = true;
                 break;
             }
         }
 
-        if (!e.Success)
+        if(DatabaseSearch.FindParcels().ContainsKey(parcel.ParcelName) == false)
         {
-           e.Success = true;
+            e.Success = false;
+            e.Message = $"Parcel: {parcel.ParcelName} does not exist in the database\n";
+        }
+        else if (e.Success)
+        {
            e.Message += $"Parcel name: {parcel.ParcelName}\n";
            e.Message += $"Parcel status: {parcel.Status}\n";
            e.Message += $"Parcel owner: {parcel.Recipient.Username}\n";

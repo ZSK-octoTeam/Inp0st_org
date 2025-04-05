@@ -8,33 +8,16 @@ namespace Inpost_org.Services.Operations.UserOperations;
 
 public class ShowParcelsOperation : UserBase
 {
-    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e)
+    public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e, string role)
     {
         e.Operation = "Show parcels";
         e.Message += "Showing parcels: \n";
-        var databaseParcels = DatabaseSearch.FindParcels(); 
-        if (person == null)
-        {
+        var databaseParcels = DatabaseSearch.FindParcels();
             foreach (var databaseParcel in databaseParcels)
             {
-                e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}\n";
-            }
-
-            e.Success = true;
-        }
-        else
-        {
-            foreach (var databaseParcel in databaseParcels)
-            {
-                if (databaseParcel.Value.Recipient.Username == person.Username)
-                {
-                    e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, you are reciver\n";
-                }
-
-                if (databaseParcel.Value.Sender.Username == person.Username)
-                {
-                    e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, you are sender\n";
-                }
+                 if (databaseParcel.Value.Recipient.Username == person.Username || databaseParcel.Value.Sender.Username == person.Username || person.Roles.Contains(Role.Administrator) || role == "InpostEmployeeAll")
+                  {
+                      e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, parcel sender: {databaseParcel.Value.Sender.Username}, parcel reciever: {databaseParcel.Value.Recipient.Username}\n";   }
             }
             e.Success = true;
         }

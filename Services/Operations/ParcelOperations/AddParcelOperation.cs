@@ -20,7 +20,12 @@ public class AddParcelOperation : ParcelBase
             }
         }
 
-        if (e.Success)
+        if(DatabaseSearch.FindUsers().ContainsKey(person.Username) == false)
+        {
+            e.Success = false;
+            e.Message = $"User: {person.Username} does not exist";
+        }
+        else if (e.Success)
         {
             mongo.collectionParcels.InsertOne(parcel);
         }

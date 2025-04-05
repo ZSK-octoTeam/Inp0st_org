@@ -16,6 +16,11 @@ internal class Program
         string input;
         Console.WriteLine(prompt);
         input = Console.ReadLine();
+        while (String.IsNullOrEmpty(input))
+        {
+            Console.WriteLine("Invalid input. Please enter a correct string:");
+            input = Console.ReadLine();
+        }
         return input;
     }
     
@@ -44,30 +49,33 @@ internal class Program
                 if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Value.Password)
                 {
                     Console.WriteLine("Log in successful.");
+                    databasePerson.Value.Roles.ForEach(role => person.Roles.Add(role));
                     return person;
                 }
                 else
                 {
                     Console.WriteLine("Log in failed. Wrong password.");
                     LogIn();
+                    return person;
                 }
             
             }
         }
         Console.WriteLine("Log in failed. User not found.");
         LogIn();
-        return null;
+        return person;
     }
     
     public static void ShowMenu(PersonModel loggedIn, MongoDBService mongo)
     {
-        while(true){
+        while(loggedIn.Roles.Contains(Role.Administrator)){
             Console.WriteLine("=== MENU ===");
             Console.WriteLine("1. Menage clients");
             Console.WriteLine("2. Menage deliverers");
             Console.WriteLine("3. Menage packages");
-            Console.WriteLine("4. Log out");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("4. Menage users");
+            Console.WriteLine("5. Log out");
+            Console.WriteLine("6. Exit");
             
             int choice = GetInputInt("Enter your choice:");
 
@@ -83,11 +91,15 @@ internal class Program
                     ShowPackagesMenu(loggedIn, mongo);
                     break;
                 case 4:
-                    Console.Clear();
-                    Console.WriteLine($"Logged out successfully.");
-                    LogIn();
+                    ShowUsersMenu(loggedIn, mongo);
                     break;
                 case 5:
+                    Console.Clear();
+                    Console.WriteLine($"Logged out successfully.");
+                    loggedIn = LogIn();
+                    ChooseMenu(loggedIn, mongo);
+                    break;
+                case 6:
                     Environment.Exit(0);
                     break;
                 default:
@@ -102,10 +114,12 @@ internal class Program
         while(true){
             Console.WriteLine("=== CLIENTS MENU ===");
             Console.WriteLine("1. Add client");
-            Console.WriteLine("2. Show client");
+            Console.WriteLine("2. Show all clients");
             Console.WriteLine("3. Delete client");
-            Console.WriteLine("4. Back");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("4. Update client");
+            Console.WriteLine("5. Search client");
+            Console.WriteLine("6. Back");
+            Console.WriteLine("7. Exit");
             
             int choice = GetInputInt("Enter your choice:");
 
@@ -121,9 +135,15 @@ internal class Program
                     DeleteClient(mongo);
                     break;
                 case 4:
-                    ShowMenu(loggedIn, mongo);
+                    UpdateClient(mongo);
                     break;
                 case 5:
+                    SearchClient(mongo);
+                    break;
+                case 6:
+                    ShowMenu(loggedIn, mongo);
+                    break;
+                case 7:
                     Environment.Exit(0);
                     break;
                 default:
@@ -138,10 +158,12 @@ internal class Program
         while(true){
             Console.WriteLine("=== DELIVERERS MENU ===");
             Console.WriteLine("1. Add deliverer");
-            Console.WriteLine("2. Show deliverer");
+            Console.WriteLine("2. Show all deliverers");
             Console.WriteLine("3. Delete deliverer");
-            Console.WriteLine("4. Back");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("4. Update deliverer");
+            Console.WriteLine("5. Search deliverer");
+            Console.WriteLine("6. Back");
+            Console.WriteLine("7. Exit");
             
             int choice = GetInputInt("Enter your choice:");
 
@@ -157,9 +179,15 @@ internal class Program
                     DeleteDeliverer(mongo);
                     break;
                 case 4:
-                    ShowMenu(loggedIn, mongo);
+                    UpdateDeliverer(mongo);
                     break;
                 case 5:
+                    SearchDeliverer(mongo);
+                    break;
+                case 6:
+                    ShowMenu(loggedIn, mongo);
+                    break;
+                case 7:
                     Environment.Exit(0);
                     break;
             }
@@ -171,28 +199,251 @@ internal class Program
         while(true){
             Console.WriteLine("=== PACKAGES MENU ===");
             Console.WriteLine("1. Add package");
-            Console.WriteLine("2. Show package");
+            Console.WriteLine("2. Show all packages");
             Console.WriteLine("3. Delete package");
-            Console.WriteLine("4. Back");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("4. Update package");
+            Console.WriteLine("5. Search package");
+            Console.WriteLine("6. Back");
+            Console.WriteLine("7. Exit");
             
             int choice = GetInputInt("Enter your choice:");
 
             switch (choice)
             {
                 case 1:
-                    //AddPackage();
+                    AddPackage(mongo);
                     break;
                 case 2:
-                    //ShowPackage();
+                    ShowPackages(loggedIn, mongo);
                     break;
                 case 3:
-                    //DeletePackage();
+                    DeletePackage(loggedIn, mongo);
                     break;
                 case 4:
-                    ShowMenu(loggedIn, mongo);
+                    UpdatePackage(loggedIn ,mongo);
                     break;
                 case 5:
+                    SearchPackage(loggedIn, mongo);
+                    break;
+                case 6:
+                    ShowMenu(loggedIn, mongo);
+                    break;
+                case 7:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
+            }
+        }
+    }
+
+    public static void ShowNormalMenu(PersonModel loggedIn, MongoDBService mongo)
+    {
+        while(!loggedIn.Roles.Contains(Role.Administrator)){
+            Console.WriteLine("=== MENU ===");
+            Console.WriteLine("1. Menage packages");
+            Console.WriteLine("2. Log out");
+            Console.WriteLine("3. Exit");
+            
+            int choice = GetInputInt("Enter your choice:");
+
+            switch (choice)
+            {
+                case 1:
+                    if(loggedIn.Roles.Contains(Role.InpostClient)){
+                        ShowPackagesMenuClient(loggedIn, mongo);
+                    }
+                    else{
+                        ShowPackagesMenuDelivery(loggedIn, mongo);
+                    }
+                    break;
+                case 2:
+                    Console.Clear();
+                    Console.WriteLine($"Logged out successfully.");
+                    loggedIn = LogIn();
+                    ChooseMenu(loggedIn, mongo);
+                    break;
+                case 3:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
+            }
+        }
+    }
+
+    public static void ShowCADMenu(PersonModel loggedIn, MongoDBService mongo)
+    {
+        while (loggedIn.Roles.Contains(Role.InpostEmployee) && loggedIn.Roles.Contains(Role.InpostClient))
+        {
+            Console.WriteLine("=== Customer and Deliverer Menu ===");
+            Console.WriteLine("1. Menage packages(deliverer)");
+            Console.WriteLine("2. Menage packages(client)");
+            Console.WriteLine("3. Log out");
+            Console.WriteLine("4. Exit");
+
+            int choice = GetInputInt("Enter your choice:");
+            switch (choice)
+            {
+                case 1:
+                    ShowPackagesMenuDelivery(loggedIn, mongo);
+                    break;
+                case 2:
+                    ShowPackagesMenuClient(loggedIn, mongo);
+                    break;
+                case 3:
+                    Console.Clear();
+                    Console.WriteLine($"Logged out successfully.");
+                    loggedIn = LogIn();
+                    ChooseMenu(loggedIn, mongo);
+                    break;
+                case 4:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
+            }
+        }
+    }
+
+    public static void ChooseMenu(PersonModel loggedIn, MongoDBService mongo)
+    {
+        if (loggedIn.Roles.Contains(Role.Administrator))
+        {
+            ShowMenu(loggedIn, mongo);
+        }
+        else if (loggedIn.Roles.Contains(Role.InpostClient) && loggedIn.Roles.Contains(Role.InpostEmployee))
+        {
+            ShowCADMenu(loggedIn, mongo);
+        }
+        else
+        {
+            ShowNormalMenu(loggedIn, mongo);
+        }
+    }
+
+    public static void ShowUsersMenu(PersonModel loggedIn, MongoDBService mongo)
+    {
+        while(true){
+            Console.WriteLine("=== USERS MENU ===");
+            Console.WriteLine("1. Add user");
+            Console.WriteLine("2. Show all users");
+            Console.WriteLine("3. Update user");
+            Console.WriteLine("4. Delete user");
+            Console.WriteLine("5. Search user");
+            Console.WriteLine("6. Back");
+            Console.WriteLine("7. Exit");
+            
+            int choice = GetInputInt("Enter your choice:");
+
+            switch (choice)
+            {
+                case 1:
+                    AddUser(mongo);
+                    break;
+                case 2:
+                    ShowUsers(loggedIn, mongo);
+                    break;
+                case 3:
+                    UpdateUser(mongo);
+                    break;
+                case 4:
+                    DeleteUser(mongo);
+                    break;
+                case 5:
+                    SearchUser(mongo);
+                    break;
+                case 6:
+                    ShowMenu(loggedIn, mongo);
+                    break;
+                case 7:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
+            }
+        }
+    }
+
+    public static void ShowPackagesMenuClient(PersonModel loggedIn, MongoDBService mongo)
+    {
+        while(true){
+            Console.WriteLine("=== PACKAGES MENU ===");
+            Console.WriteLine("1. Order package");
+            Console.WriteLine("2. Show all my packages");
+            Console.WriteLine("3. Cancel package");
+            Console.WriteLine("4. Search package");
+            Console.WriteLine("5. Back");
+            Console.WriteLine("6. Exit");
+            
+            int choice = GetInputInt("Enter your choice:");
+
+            switch (choice)
+            {
+                case 1:
+                    OrderPackage(loggedIn, mongo);
+                    break;
+                case 2:
+                    ShowMyPackages(loggedIn, mongo);
+                    break;
+                case 3:
+                    DeletePackage(loggedIn, mongo);
+                    break;
+                case 4:
+                    SearchPackage(loggedIn, mongo);
+                    break;
+                case 5:
+                    ChooseMenu(loggedIn, mongo);
+                    break;
+                case 6:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Please enter a correct number:");
+                    break;
+            }
+        }
+    }
+
+    public static void ShowPackagesMenuDelivery(PersonModel loggedIn, MongoDBService mongo)
+    {
+        while(true){
+            Console.WriteLine("=== PACKAGES MENU ===");
+            Console.WriteLine("1. Show all my packages");
+            Console.WriteLine("2. Show all packages");
+            Console.WriteLine("3. Pick up package");
+            Console.WriteLine("4. Deliver package");
+            Console.WriteLine("5. Search package");
+            Console.WriteLine("6. Back");
+            Console.WriteLine("7. Exit");
+            
+            int choice = GetInputInt("Enter your choice:");
+
+            switch (choice)
+            {
+                case 1:
+                    ShowMyPackages(loggedIn, mongo);
+                    break;
+                case 2:
+                    ShowPackages(loggedIn, mongo);
+                    break;
+                case 3:
+                    PickUpPackage(loggedIn, mongo);
+                    break;
+                case 4:
+                    DeliverPackage(loggedIn, mongo);
+                    break;
+                case 5:
+                    SearchPackage(loggedIn, mongo);
+                    break;
+                case 6:
+                    ChooseMenu(loggedIn, mongo);
+                    break;
+                case 7:
                     Environment.Exit(0);
                     break;
                 default:
@@ -206,31 +457,16 @@ internal class Program
         Console.WriteLine("=== CLIENTS ===");
         ShowUsersOperation showUsers = new ShowUsersOperation();
         showUsers.Notify += EventListener.OnUserOperation;
-        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs());
+        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostClient");
     }
 
-    public static void AddClient(MongoDBService mongo){
+    public static void AddClient(MongoDBService mongo)
+    {
         Console.WriteLine("=== ADD CLIENT ===");
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
         PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
-        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-        {
-            if (databasePerson.Username == addedUser.Username)
-            {
-                if(!databasePerson.Roles.Contains(Role.InpostClient))
-                {
-                    databasePerson.AddRole(Role.InpostClient);
-                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
-                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
-                    mongo.collectionUsers.UpdateOne(filter, update);
-                    Console.WriteLine("Added role client to user.");
-                    return;
-                }
-            }
-        }
-        addedUser.AddRole(Role.InpostClient);
-        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs());
+        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostClient");
     }
 
     public static void DeleteClient(MongoDBService mongo){
@@ -238,40 +474,32 @@ internal class Program
         DeleteUserOperation deleteUser = new DeleteUserOperation();
         deleteUser.Notify += EventListener.OnUserOperation;
         PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
-        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-        {
-            if (databasePerson.Username == deletedUser.Username)
-            {
-                if(databasePerson.Roles.Contains(Role.InpostClient))
-                {
-                    databasePerson.Roles.Remove(Role.InpostClient);
-                }
-                else
-                {
-                    Console.WriteLine("User is not a client.");
-                    return;
-                }
+        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs(), "InpostClient");
+    }
 
-                if(databasePerson.Roles.Count != 0)
-                {
-                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
-                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
-                    mongo.collectionUsers.UpdateOne(filter, update);
-                    System.Console.WriteLine("Deleted role client from user.");
-                    return;
-                    
-                }
-            }
-        }
-        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
-        return;
+    public static void UpdateClient(MongoDBService mongo)
+    {
+        Console.WriteLine("=== UPDATE CLIENT ===");
+        UpdateUserOperation updateUser = new UpdateUserOperation();
+        updateUser.Notify += EventListener.OnUserOperation;
+        PersonModel updatedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter new password:"));
+        updateUser.Operation(mongo, updatedUser, new MongoDBOperationEventArgs(), "InpostClient");
+    }
+
+    public static void SearchClient(MongoDBService mongo)
+    {
+        Console.WriteLine("=== SEARCH CLIENT ===");
+        ShowUserOperation showClient = new ShowUserOperation();
+        showClient.Notify += EventListener.OnUserOperation;
+        PersonModel searchedDeliverer = new PersonModel(GetInputString("Enter username: "), "");
+        showClient.Operation(mongo, searchedDeliverer, new MongoDBOperationEventArgs(), "InpostClient");
     }
 
     public static void ShowDeliverers(PersonModel loggedIn,MongoDBService mongo){
         Console.WriteLine("=== DELIVERERS ===");
         ShowUsersOperation showUsers = new ShowUsersOperation();
         showUsers.Notify += EventListener.OnUserOperation;
-        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs());
+        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostEmployee");
     }
 
     public static void AddDeliverer(MongoDBService mongo){
@@ -279,23 +507,7 @@ internal class Program
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
         PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
-        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-        {
-            if (databasePerson.Username == addedUser.Username)
-            {
-                if(!databasePerson.Roles.Contains(Role.InpostEmployee))
-                {
-                    databasePerson.AddRole(Role.InpostEmployee);
-                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
-                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
-                    mongo.collectionUsers.UpdateOne(filter, update);
-                    Console.WriteLine("Added role deliverer to user.");
-                    return;
-                }
-            }
-        }
-        addedUser.AddRole(Role.InpostEmployee);
-        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs());
+        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostEmployee");
     }
 
     public static void DeleteDeliverer(MongoDBService mongo){
@@ -303,46 +515,183 @@ internal class Program
         DeleteUserOperation deleteUser = new DeleteUserOperation();
         deleteUser.Notify += EventListener.OnUserOperation;
         PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
-        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-        {
-            if (databasePerson.Username == deletedUser.Username)
-            {
-                if(databasePerson.Roles.Contains(Role.InpostEmployee))
-                {
-                    databasePerson.Roles.Remove(Role.InpostEmployee);
-                }
-                else
-                {
-                    Console.WriteLine("User is not a deliverer.");
-                    return;
-                }
-
-                if(databasePerson.Roles.Count != 0)
-                {
-                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, databasePerson.Username);
-                    var update = Builders<PersonModel>.Update.Set(r => r.Roles, databasePerson.Roles);
-                    mongo.collectionUsers.UpdateOne(filter, update);
-                    Console.WriteLine("Deleted role deliverer from user.");
-                    return;
-                    
-                }
-            }   
-        }
-        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs());
-        return;
+        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs(), "InpostEmployee");
     }
-    
+
+    public static void UpdateDeliverer(MongoDBService mongo)
+    {
+        Console.WriteLine("=== UPDATE DELIVERER ===");
+        UpdateUserOperation updateDeliverer = new UpdateUserOperation();
+        updateDeliverer.Notify += EventListener.OnUserOperation;
+        PersonModel updatedDeliverer = new PersonModel(GetInputString("Enter username: "), GetInputString("Enter new password: "));
+        updateDeliverer.Operation(mongo, updatedDeliverer, new MongoDBOperationEventArgs(), "InpostEmployee");
+    }
+
+    public static void SearchDeliverer(MongoDBService mongo)
+    {
+        Console.WriteLine("=== SEARCH DELIVERER ===");
+        ShowUserOperation showDeliverer = new ShowUserOperation();
+        showDeliverer.Notify += EventListener.OnUserOperation;
+        PersonModel searchedDeliverer = new PersonModel(GetInputString("Enter username: "), "");
+        showDeliverer.Operation(mongo, searchedDeliverer, new MongoDBOperationEventArgs(), "InpostEmployee");
+    }
+
+    public static void ShowUsers(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== USERS ===");
+        ShowUsersOperation showUsers = new ShowUsersOperation();
+        showUsers.Notify += EventListener.OnUserOperation;
+        showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "");
+    }
+
+    public static void AddUser(MongoDBService mongo)
+    {
+        Console.WriteLine("=== ADD USER ===");
+        AddUserOperation addUser = new AddUserOperation();
+        addUser.Notify += EventListener.OnUserOperation;
+        PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
+        Role r;
+        while(!Enum.TryParse(GetInputString("Enter role:"), out r))
+        {
+            Console.WriteLine("Invalid role. Please enter one of following roles:");
+            Console.WriteLine("-Administrator");
+            Console.WriteLine("-InpostClient");
+            Console.WriteLine("-InpostEmployee");
+        }
+        addedUser.Roles.Add(r);
+        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "");
+    }
+
+    public static void DeleteUser(MongoDBService mongo)
+    {
+        Console.WriteLine("=== DELETE USER ===");
+        DeleteUserOperation deleteUser = new DeleteUserOperation();
+        deleteUser.Notify += EventListener.OnUserOperation;
+        PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
+        deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs(), "");
+    }
+
+    public static void UpdateUser(MongoDBService mongo)
+    {
+        Console.WriteLine("=== UPDATE USER ===");
+        UpdateUserOperation updateUser = new UpdateUserOperation();
+        updateUser.Notify += EventListener.OnUserOperation;
+        PersonModel updatedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter new password:"));
+        updateUser.Operation(mongo, updatedUser, new MongoDBOperationEventArgs(), "");
+    }
+
+    public static void SearchUser(MongoDBService mongo)
+    {
+        Console.WriteLine("=== SEARCH USER ===");
+        ShowUserOperation showUser = new ShowUserOperation();
+        showUser.Notify += EventListener.OnUserOperation;
+        PersonModel searchedUser = new PersonModel(GetInputString("Enter username: "), "");
+        showUser.Operation(mongo, searchedUser, new MongoDBOperationEventArgs(), "");
+    }
+
+    public static void ShowPackages(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== PACKAGES ===");
+        ShowParcelsOperation showParcels = new ShowParcelsOperation();
+        showParcels.Notify += EventListener.OnUserOperation;
+        showParcels.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostEmployeeAll");
+    }
+
+    public static void ShowMyPackages(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== MY PACKAGES ===");
+        ShowParcelsOperation showParcels = new ShowParcelsOperation();
+        showParcels.Notify += EventListener.OnUserOperation;
+        showParcels.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "");
+    }
+
+    public static void AddPackage(MongoDBService mongo)
+    {
+        Console.WriteLine("=== ADD PACKAGE ===");
+        AddParcelOperation addParcel = new AddParcelOperation();
+        addParcel.Notify += EventListener.OnParcelOperation;
+        PersonModel personModel = new PersonModel(GetInputString("Enter sender username:"), "");
+        ParcelModel addedParcel = new ParcelModel(GetInputString("Enter parcel name:"), personModel);
+        addParcel.Operation(mongo, addedParcel, personModel ,new MongoDBOperationEventArgs());
+    }
+
+    public static void OrderPackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== ORDER PACKAGE ===");
+        AddParcelOperation addParcel = new AddParcelOperation();
+        addParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel addedParcel = new ParcelModel(GetInputString("Enter parcel name:"), loggedIn);
+        addParcel.Operation(mongo, addedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void DeletePackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== DELETE PACKAGE ===");
+        DeleteParcelOperation deleteParcel = new DeleteParcelOperation();
+        deleteParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel deletedParcel = new ParcelModel(GetInputString("Enter parcel name:"), loggedIn);
+        deleteParcel.Operation(mongo, deletedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void UpdatePackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== UPDATE PACKAGE ===");
+        UpdateParcelOperation updateParcel = new UpdateParcelOperation();
+        updateParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel(GetInputString("Enter new recipient username:"), ""));
+        PersonModel delivererModel = new PersonModel(GetInputString("Enter new deliverer username:"), "");
+        updatedParcel.ChangeSender(delivererModel);
+        ParcelStatus s;
+        while (!Enum.TryParse(GetInputString("Enter new status:"), out s))
+        {
+            Console.WriteLine("Invalid status. Please enter one of following statuses:");
+            Console.WriteLine("-InWarehouse");
+            Console.WriteLine("-InTransport");
+            Console.WriteLine("-Delivered");
+        }
+        updatedParcel.ChangeStatus(s);
+        updateParcel.Operation(mongo, updatedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void PickUpPackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== PICK UP PACKAGE ===");
+        UpdateParcelOperation updateParcel = new UpdateParcelOperation();
+        updateParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel("", ""));
+        updatedParcel.ChangeStatus(ParcelStatus.InTransport);
+        updatedParcel.ChangeSender(loggedIn);
+        updateParcel.Operation(mongo, updatedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void DeliverPackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== DELIVER PACKAGE ===");
+        UpdateParcelOperation updateParcel = new UpdateParcelOperation();
+        updateParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel("", ""));
+        updatedParcel.ChangeStatus(ParcelStatus.Delivered);
+        updatedParcel.ChangeSender(loggedIn);
+        updateParcel.Operation(mongo, updatedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
+
+    public static void SearchPackage(PersonModel loggedIn, MongoDBService mongo)
+    {
+        Console.WriteLine("=== SEARCH PACKAGE ===");
+        ShowParcelOperation showParcel = new ShowParcelOperation();
+        showParcel.Notify += EventListener.OnParcelOperation;
+        ParcelModel searchedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel("", ""));
+        showParcel.Operation(mongo, searchedParcel, loggedIn, new MongoDBOperationEventArgs());
+    }
     public static void Main(string[] args)
     {
         // Database
         MongoDBService mongo = new MongoDBService();
         mongo.Connect();
         DatabaseSearch.mongo = mongo;
-
         // Log in and show menu
         /*
         PersonModel loggedIn = LogIn();
-        ShowMenu(loggedIn, mongo);
-        */
+        ChooseMenu(loggedIn, mongo);
     }
 }
