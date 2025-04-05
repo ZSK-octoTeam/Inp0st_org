@@ -13,14 +13,15 @@ public class ShowParcelsOperation : UserBase
         e.Operation = "Show parcels";
         e.Message += "Showing parcels: \n";
         var databaseParcels = DatabaseSearch.FindParcels();
-            foreach (var databaseParcel in databaseParcels)
-            {
-                 if (databaseParcel.Value.Recipient.Username == person.Username || databaseParcel.Value.Sender.Username == person.Username || person.Roles.Contains(Role.Administrator) || role == "InpostEmployeeAll")
-                  {
-                      e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, parcel sender: {databaseParcel.Value.Sender.Username}, parcel reciever: {databaseParcel.Value.Recipient.Username}\n";   }
-            }
-            e.Success = true;
+        foreach (var databaseParcel in databaseParcels)
+        {
+             if (databaseParcel.Value.Recipient.Username == person.Username || databaseParcel.Value.Sender.Username == person.Username || person.Roles.Contains(Role.Administrator) || role == "InpostEmployeeAll")
+              { 
+                  e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, parcel sender: {databaseParcel.Value.Sender.Username}, parcel reciever: {databaseParcel.Value.Recipient.Username}\n";   
+              }
         }
+
+        e.Success = true;
         OnNotify(person, e);
     }
 }

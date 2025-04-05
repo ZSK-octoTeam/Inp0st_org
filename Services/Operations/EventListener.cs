@@ -27,7 +27,7 @@ public class EventListener : LogManager
         string message = $"Operation '{e.Operation}' completed for user: {user}, with status: {action}.\n{e.Message}";
         
         Console.WriteLine(message);
-        LogToFile(e);
+        //LogToFile(e);
     }
 
     public static void OnParcelOperation(object sender, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
@@ -36,6 +36,6 @@ public class EventListener : LogManager
         string message = $"Operation '{e.Operation}' completed for parcel: {parcel.ParcelName}, with status: {action}.\n{e.Message}";
         
         Console.WriteLine(message);
-        LogToFile(e);
+        //LogToFile(e);
     }
 }

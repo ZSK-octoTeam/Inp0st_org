@@ -689,9 +689,13 @@ internal class Program
         MongoDBService mongo = new MongoDBService();
         mongo.Connect();
         DatabaseSearch.mongo = mongo;
+        
+        Tests.TestAddUserOperation(mongo);
+        
         // Log in and show menu
         /*
         PersonModel loggedIn = LogIn();
         ChooseMenu(loggedIn, mongo);
+        */
     }
 }
