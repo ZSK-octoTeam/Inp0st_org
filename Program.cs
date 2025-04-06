@@ -66,6 +66,21 @@ internal class Program
         return input;
     }
 
+    public static void ShowHeader(string prompt)
+    {
+        Console.Clear();
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine(prompt);
+        Console.ResetColor();
+    }
+
+    public static void ShowError(string prompt)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine(prompt);
+        Console.ResetColor();
+    }
+
     public static bool CheckCredentials(string username, string password)
     {
         if(DatabaseSearch.FindUsers().ContainsKey(username))
@@ -107,10 +122,7 @@ internal class Program
         
         do
         {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine("=== LOG IN ===");
-            Console.ResetColor();
+            ShowHeader("=== LOG IN ===");
             username = GetInputString("Enter your username:");
             password = GetPassword("Enter your password:");
         }while(!CheckCredentials(username, password));
@@ -123,10 +135,7 @@ internal class Program
     {
         while(loggedIn.Roles.Contains(Role.Administrator))
         {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine("=== MENU ===");
-            Console.ResetColor();
+            ShowHeader("=== MENU ===");
             Console.WriteLine("1. Menage clients");
             Console.WriteLine("2. Menage deliverers");
             Console.WriteLine("3. Menage packages");
@@ -172,7 +181,7 @@ internal class Program
     public static void ShowClientsMenu(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
-            Console.WriteLine("=== CLIENTS MENU ===");
+            ShowHeader("=== CLIENTS MENU ===");
             Console.WriteLine("1. Add client");
             Console.WriteLine("2. Show all clients");
             Console.WriteLine("3. Delete client");
@@ -216,7 +225,7 @@ internal class Program
     public static void ShowDeliverersMenu(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
-            Console.WriteLine("=== DELIVERERS MENU ===");
+            ShowHeader("=== DELIVERERS MENU ===");
             Console.WriteLine("1. Add deliverer");
             Console.WriteLine("2. Show all deliverers");
             Console.WriteLine("3. Delete deliverer");
@@ -257,7 +266,7 @@ internal class Program
     public static void ShowPackagesMenu(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
-            Console.WriteLine("=== PACKAGES MENU ===");
+            ShowHeader("=== PACKAGES MENU ===");
             Console.WriteLine("1. Add package");
             Console.WriteLine("2. Show all packages");
             Console.WriteLine("3. Delete package");
@@ -301,7 +310,7 @@ internal class Program
     public static void ShowNormalMenu(PersonModel loggedIn, MongoDBService mongo)
     {
         while(!loggedIn.Roles.Contains(Role.Administrator)){
-            Console.WriteLine("=== MENU ===");
+            ShowHeader("=== MENU ===");
             Console.WriteLine("1. Menage packages");
             Console.WriteLine("2. Log out");
             Console.WriteLine("3. Exit");
@@ -338,7 +347,7 @@ internal class Program
     {
         while (loggedIn.Roles.Contains(Role.InpostEmployee) && loggedIn.Roles.Contains(Role.InpostClient))
         {
-            Console.WriteLine("=== Customer and Deliverer Menu ===");
+            ShowHeader("=== Customer and Deliverer Menu ===");
             Console.WriteLine("1. Menage packages(deliverer)");
             Console.WriteLine("2. Menage packages(client)");
             Console.WriteLine("3. Log out");
@@ -388,7 +397,7 @@ internal class Program
     public static void ShowUsersMenu(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
-            Console.WriteLine("=== USERS MENU ===");
+            ShowHeader("=== USERS MENU ===");
             Console.WriteLine("1. Add user");
             Console.WriteLine("2. Show all users");
             Console.WriteLine("3. Update user");
@@ -432,7 +441,7 @@ internal class Program
     public static void ShowPackagesMenuClient(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
-            Console.WriteLine("=== PACKAGES MENU ===");
+            ShowHeader("=== PACKAGES MENU ===");
             Console.WriteLine("1. Order package");
             Console.WriteLine("2. Show all my packages");
             Console.WriteLine("3. Cancel package");
@@ -472,7 +481,7 @@ internal class Program
     public static void ShowPackagesMenuDelivery(PersonModel loggedIn, MongoDBService mongo)
     {
         while(true){
-            Console.WriteLine("=== PACKAGES MENU ===");
+            ShowHeader("=== PACKAGES MENU ===");
             Console.WriteLine("1. Show all my packages");
             Console.WriteLine("2. Show all packages");
             Console.WriteLine("3. Pick up package");
@@ -514,23 +523,26 @@ internal class Program
     }
 
     public static void ShowClients(PersonModel loggedIn,MongoDBService mongo){
-        Console.WriteLine("=== CLIENTS ===");
+        ShowHeader("=== CLIENTS ===");
         ShowUsersOperation showUsers = new ShowUsersOperation();
         showUsers.Notify += EventListener.OnUserOperation;
         showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostClient");
+        Console.ReadKey();
     }
 
     public static void AddClient(MongoDBService mongo)
     {
-        Console.WriteLine("=== ADD CLIENT ===");
+        ShowHeader("=== ADD CLIENT ===");
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
-        PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
+        PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetPassword("Enter password:"));
+        Console.WriteLine();
         addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostClient");
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void DeleteClient(MongoDBService mongo){
-        Console.WriteLine("=== DELETE CLIENT ===");
+        ShowHeader("=== DELETE CLIENT ===");
         DeleteUserOperation deleteUser = new DeleteUserOperation();
         deleteUser.Notify += EventListener.OnUserOperation;
         PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
@@ -539,7 +551,7 @@ internal class Program
 
     public static void UpdateClient(MongoDBService mongo)
     {
-        Console.WriteLine("=== UPDATE CLIENT ===");
+        ShowHeader("=== UPDATE CLIENT ===");
         UpdateUserOperation updateUser = new UpdateUserOperation();
         updateUser.Notify += EventListener.OnUserOperation;
         PersonModel updatedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter new password:"));
@@ -548,22 +560,23 @@ internal class Program
 
     public static void SearchClient(MongoDBService mongo)
     {
-        Console.WriteLine("=== SEARCH CLIENT ===");
+        ShowHeader("=== SEARCH CLIENT ===");
         ShowUserOperation showClient = new ShowUserOperation();
         showClient.Notify += EventListener.OnUserOperation;
         PersonModel searchedDeliverer = new PersonModel(GetInputString("Enter username: "), "");
         showClient.Operation(mongo, searchedDeliverer, new MongoDBOperationEventArgs(), "InpostClient");
+        Console.ReadKey();
     }
 
     public static void ShowDeliverers(PersonModel loggedIn,MongoDBService mongo){
-        Console.WriteLine("=== DELIVERERS ===");
+        ShowHeader("=== DELIVERERS ===");
         ShowUsersOperation showUsers = new ShowUsersOperation();
         showUsers.Notify += EventListener.OnUserOperation;
         showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostEmployee");
     }
 
     public static void AddDeliverer(MongoDBService mongo){
-        Console.WriteLine("=== ADD DELIVERER ===");
+        ShowHeader("=== ADD DELIVERER ===");
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
         PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
@@ -571,7 +584,7 @@ internal class Program
     }
 
     public static void DeleteDeliverer(MongoDBService mongo){
-        Console.WriteLine("=== DELETE DELIVERER ===");
+        ShowHeader("=== DELETE DELIVERER ===");
         DeleteUserOperation deleteUser = new DeleteUserOperation();
         deleteUser.Notify += EventListener.OnUserOperation;
         PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
@@ -580,7 +593,7 @@ internal class Program
 
     public static void UpdateDeliverer(MongoDBService mongo)
     {
-        Console.WriteLine("=== UPDATE DELIVERER ===");
+        ShowHeader("=== UPDATE DELIVERER ===");
         UpdateUserOperation updateDeliverer = new UpdateUserOperation();
         updateDeliverer.Notify += EventListener.OnUserOperation;
         PersonModel updatedDeliverer = new PersonModel(GetInputString("Enter username: "), GetInputString("Enter new password: "));
@@ -589,7 +602,7 @@ internal class Program
 
     public static void SearchDeliverer(MongoDBService mongo)
     {
-        Console.WriteLine("=== SEARCH DELIVERER ===");
+        ShowHeader("=== SEARCH DELIVERER ===");
         ShowUserOperation showDeliverer = new ShowUserOperation();
         showDeliverer.Notify += EventListener.OnUserOperation;
         PersonModel searchedDeliverer = new PersonModel(GetInputString("Enter username: "), "");
@@ -598,7 +611,7 @@ internal class Program
 
     public static void ShowUsers(PersonModel loggedIn, MongoDBService mongo)
     {
-        Console.WriteLine("=== USERS ===");
+        ShowHeader("=== USERS ===");
         ShowUsersOperation showUsers = new ShowUsersOperation();
         showUsers.Notify += EventListener.OnUserOperation;
         showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "");
@@ -606,25 +619,26 @@ internal class Program
 
     public static void AddUser(MongoDBService mongo)
     {
-        Console.WriteLine("=== ADD USER ===");
+        ShowHeader("=== ADD USER ===");
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
         PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
         Role r;
         while(!Enum.TryParse(GetInputString("Enter role:"), out r))
         {
-            Console.WriteLine("Invalid role. Please enter one of following roles:");
+            ShowError("Invalid role. Please enter one of following roles:");
             Console.WriteLine("-Administrator");
             Console.WriteLine("-InpostClient");
             Console.WriteLine("-InpostEmployee");
         }
         addedUser.Roles.Add(r);
         addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "");
+        System.Threading.Thread.Sleep(2500);
     }
 
     public static void DeleteUser(MongoDBService mongo)
     {
-        Console.WriteLine("=== DELETE USER ===");
+        ShowHeader("=== DELETE USER ===");
         DeleteUserOperation deleteUser = new DeleteUserOperation();
         deleteUser.Notify += EventListener.OnUserOperation;
         PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
@@ -633,7 +647,7 @@ internal class Program
 
     public static void UpdateUser(MongoDBService mongo)
     {
-        Console.WriteLine("=== UPDATE USER ===");
+        ShowHeader("=== UPDATE USER ===");
         UpdateUserOperation updateUser = new UpdateUserOperation();
         updateUser.Notify += EventListener.OnUserOperation;
         PersonModel updatedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter new password:"));
@@ -642,7 +656,7 @@ internal class Program
 
     public static void SearchUser(MongoDBService mongo)
     {
-        Console.WriteLine("=== SEARCH USER ===");
+        ShowHeader("=== SEARCH USER ===");
         ShowUserOperation showUser = new ShowUserOperation();
         showUser.Notify += EventListener.OnUserOperation;
         PersonModel searchedUser = new PersonModel(GetInputString("Enter username: "), "");
@@ -651,7 +665,7 @@ internal class Program
 
     public static void ShowPackages(PersonModel loggedIn, MongoDBService mongo)
     {
-        Console.WriteLine("=== PACKAGES ===");
+        ShowHeader("=== PACKAGES ===");
         ShowParcelsOperation showParcels = new ShowParcelsOperation();
         showParcels.Notify += EventListener.OnUserOperation;
         showParcels.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostEmployeeAll");
@@ -659,7 +673,7 @@ internal class Program
 
     public static void ShowMyPackages(PersonModel loggedIn, MongoDBService mongo)
     {
-        Console.WriteLine("=== MY PACKAGES ===");
+        ShowHeader("=== MY PACKAGES ===");
         ShowParcelsOperation showParcels = new ShowParcelsOperation();
         showParcels.Notify += EventListener.OnUserOperation;
         showParcels.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "");
@@ -667,7 +681,7 @@ internal class Program
 
     public static void AddPackage(MongoDBService mongo)
     {
-        Console.WriteLine("=== ADD PACKAGE ===");
+        ShowHeader("=== ADD PACKAGE ===");
         AddParcelOperation addParcel = new AddParcelOperation();
         addParcel.Notify += EventListener.OnParcelOperation;
         PersonModel personModel = new PersonModel(GetInputString("Enter sender username:"), "");
@@ -677,7 +691,7 @@ internal class Program
 
     public static void OrderPackage(PersonModel loggedIn, MongoDBService mongo)
     {
-        Console.WriteLine("=== ORDER PACKAGE ===");
+        ShowHeader("=== ORDER PACKAGE ===");
         AddParcelOperation addParcel = new AddParcelOperation();
         addParcel.Notify += EventListener.OnParcelOperation;
         ParcelModel addedParcel = new ParcelModel(GetInputString("Enter parcel name:"), loggedIn);
@@ -686,7 +700,7 @@ internal class Program
 
     public static void DeletePackage(PersonModel loggedIn, MongoDBService mongo)
     {
-        Console.WriteLine("=== DELETE PACKAGE ===");
+        ShowHeader("=== DELETE PACKAGE ===");
         DeleteParcelOperation deleteParcel = new DeleteParcelOperation();
         deleteParcel.Notify += EventListener.OnParcelOperation;
         ParcelModel deletedParcel = new ParcelModel(GetInputString("Enter parcel name:"), loggedIn);
@@ -695,7 +709,7 @@ internal class Program
 
     public static void UpdatePackage(PersonModel loggedIn, MongoDBService mongo)
     {
-        Console.WriteLine("=== UPDATE PACKAGE ===");
+        ShowHeader("=== UPDATE PACKAGE ===");
         UpdateParcelOperation updateParcel = new UpdateParcelOperation();
         updateParcel.Notify += EventListener.OnParcelOperation;
         ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel(GetInputString("Enter new recipient username:"), ""));
@@ -715,7 +729,7 @@ internal class Program
 
     public static void PickUpPackage(PersonModel loggedIn, MongoDBService mongo)
     {
-        Console.WriteLine("=== PICK UP PACKAGE ===");
+        ShowHeader("=== PICK UP PACKAGE ===");
         UpdateParcelOperation updateParcel = new UpdateParcelOperation();
         updateParcel.Notify += EventListener.OnParcelOperation;
         ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel("", ""));
@@ -726,7 +740,7 @@ internal class Program
 
     public static void DeliverPackage(PersonModel loggedIn, MongoDBService mongo)
     {
-        Console.WriteLine("=== DELIVER PACKAGE ===");
+        ShowHeader("=== DELIVER PACKAGE ===");
         UpdateParcelOperation updateParcel = new UpdateParcelOperation();
         updateParcel.Notify += EventListener.OnParcelOperation;
         ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel("", ""));
@@ -737,7 +751,7 @@ internal class Program
 
     public static void SearchPackage(PersonModel loggedIn, MongoDBService mongo)
     {
-        Console.WriteLine("=== SEARCH PACKAGE ===");
+        ShowHeader("=== SEARCH PACKAGE ===");
         ShowParcelOperation showParcel = new ShowParcelOperation();
         showParcel.Notify += EventListener.OnParcelOperation;
         ParcelModel searchedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel("", ""));
