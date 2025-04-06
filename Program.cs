@@ -1,4 +1,5 @@
-﻿using Inpost_org.Services.Operations.ParcelOperations;
+﻿using System.Text;
+using Inpost_org.Services.Operations.ParcelOperations;
 using Inpost_org.Services.Operations.UserOperations;
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Services.Operations;
@@ -23,53 +24,109 @@ internal class Program
         }
         return input;
     }
+
+    public static string GetPassword(string prompt)
+    {
+        var password = new StringBuilder();
+        ConsoleKeyInfo key;
+        Console.WriteLine(prompt);
+        while ((key = Console.ReadKey(true)).Key != ConsoleKey.Enter)
+        {
+            if (key.Key == ConsoleKey.Backspace)
+            {
+                if (password.Length > 0)
+                {
+                    password.Length -= 1;
+                    Console.Write("\b \b");
+                }
+            }
+            else
+            {
+                password.Append(key.KeyChar);
+                Console.Write("*");
+            }
+        }
+
+        Console.WriteLine();
+        return password.ToString();
+    }
     
     public static int GetInputInt(string prompt)
     {
         int input;
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine(prompt);
+        Console.ResetColor();
         while (!int.TryParse(Console.ReadLine(), out input))
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Invalid input. Please enter a correct number:");
+            Console.ResetColor();
         }
         return input;
+    }
+
+    public static bool CheckCredentials(string username, string password)
+    {
+        if(DatabaseSearch.FindUsers().ContainsKey(username))
+        {
+            DatabaseSearch.FindUsers().TryGetValue(username, out PersonModel databasePerson);
+                
+            if (databasePerson.Password == DatabaseSearch.HashPassword(password))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Log in successful.");
+                Console.ResetColor();
+                System.Threading.Thread.Sleep(2500);
+                return true;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Log in failed. Wrong password.");
+                Console.ResetColor();
+                    
+                System.Threading.Thread.Sleep(2500);
+            }
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Log in failed. User not found.");
+            Console.ResetColor();
+            System.Threading.Thread.Sleep(2500);
+        }
+
+        return false;
     }
     
     public static PersonModel LogIn()
     {
-        string username = GetInputString("Enter your username:");
-        string password = GetInputString("Enter your password:");
-    
-        PersonModel person = new PersonModel(username, password);
+        string username = "";
+        string password = "";
         
-        foreach (var databasePerson in DatabaseSearch.FindUsers())
+        do
         {
-            if (databasePerson.Key == person.Username)
-            {
-                if(DatabaseSearch.HashPassword(person.Password) == databasePerson.Value.Password)
-                {
-                    Console.WriteLine("Log in successful.");
-                    databasePerson.Value.Roles.ForEach(role => person.Roles.Add(role));
-                    return person;
-                }
-                else
-                {
-                    Console.WriteLine("Log in failed. Wrong password.");
-                    LogIn();
-                    return person;
-                }
-            
-            }
-        }
-        Console.WriteLine("Log in failed. User not found.");
-        LogIn();
-        return person;
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine("=== LOG IN ===");
+            Console.ResetColor();
+            username = GetInputString("Enter your username:");
+            password = GetPassword("Enter your password:");
+        }while(!CheckCredentials(username, password));
+        
+        DatabaseSearch.FindUsers().TryGetValue(username, out PersonModel loggedIn);
+        return loggedIn;
     }
     
     public static void ShowMenu(PersonModel loggedIn, MongoDBService mongo)
     {
-        while(loggedIn.Roles.Contains(Role.Administrator)){
+        while(loggedIn.Roles.Contains(Role.Administrator))
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.WriteLine("=== MENU ===");
+            Console.ResetColor();
             Console.WriteLine("1. Menage clients");
             Console.WriteLine("2. Menage deliverers");
             Console.WriteLine("3. Menage packages");
@@ -103,7 +160,10 @@ internal class Program
                     Environment.Exit(0);
                     break;
                 default:
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Invalid input. Please enter a correct number:");
+                    Console.ResetColor();
+                    System.Threading.Thread.Sleep(2500);
                     break;
             }
         }
@@ -690,12 +750,9 @@ internal class Program
         mongo.Connect();
         DatabaseSearch.mongo = mongo;
         
-        Tests.TestAddUserOperation(mongo);
+        //Tests.TestAddUserOperation(mongo);
         
-        // Log in and show menu
-        /*
         PersonModel loggedIn = LogIn();
         ChooseMenu(loggedIn, mongo);
-        */
     }
 }

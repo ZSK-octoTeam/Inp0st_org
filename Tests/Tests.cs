@@ -17,16 +17,12 @@ public class Tests
             AddUserOperation add = new AddUserOperation();
             add.Notify += EventListener.OnUserOperation;
 
-            PersonModel person = new PersonModel("user1", "haslo1");
-            person.AddRole(Role.InpostEmployee);
+            DeleteUserOperation del = new DeleteUserOperation();
+            del.Notify += EventListener.OnUserOperation;
+
+            PersonModel person = new PersonModel("Admin", "passAdmin");
             
-            PersonModel person1 = new PersonModel("user2", "haslo");
-            person.AddRole(Role.InpostClient);
-            
-            PersonModel person2 = new PersonModel("user3", "haslo");
-            person.AddRole(Role.Administrator);
-            
-            add.Operation(mongo, person, new MongoDBOperationEventArgs(), "");
+            add.Operation(mongo, person, new MongoDBOperationEventArgs(), "Administrator");
         }
         catch (Exception e)
         {
