@@ -15,10 +15,21 @@ public class ShowParcelsOperation : UserBase
         var databaseParcels = DatabaseSearch.FindParcels();
         foreach (var databaseParcel in databaseParcels)
         {
-             if (databaseParcel.Value.Recipient.Username == person.Username || databaseParcel.Value.Sender.Username == person.Username || person.Roles.Contains(Role.Administrator) || role == "InpostEmployeeAll")
-              { 
-                  e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, parcel sender: {databaseParcel.Value.Sender.Username}, parcel reciever: {databaseParcel.Value.Recipient.Username}\n";   
-              }
+            try
+            {
+                string sender = databaseParcel.Value.Sender == null ? "N/A" : databaseParcel.Value.Sender.Username;
+                string reciver = databaseParcel.Value.Recipient == null ? "N/A" : databaseParcel.Value.Recipient.Username;
+                if (sender == person.Username || reciver == person.Username || person.Roles.Contains(Role.Administrator) || role == "InpostEmployeeAll")
+                {
+                    
+                    e.Message += $"Parcel name: {databaseParcel.Value.ParcelName}, parcel status: {databaseParcel.Value.Status}, parcel sender: {sender}, parcel reciever: {reciver}\n";
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
         }
 
         e.Success = true;

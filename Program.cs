@@ -547,6 +547,7 @@ internal class Program
         deleteUser.Notify += EventListener.OnUserOperation;
         PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
         deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs(), "InpostClient");
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void UpdateClient(MongoDBService mongo)
@@ -556,6 +557,7 @@ internal class Program
         updateUser.Notify += EventListener.OnUserOperation;
         PersonModel updatedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter new password:"));
         updateUser.Operation(mongo, updatedUser, new MongoDBOperationEventArgs(), "InpostClient");
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void SearchClient(MongoDBService mongo)
@@ -669,6 +671,7 @@ internal class Program
         ShowParcelsOperation showParcels = new ShowParcelsOperation();
         showParcels.Notify += EventListener.OnUserOperation;
         showParcels.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostEmployeeAll");
+        Console.ReadKey();
     }
 
     public static void ShowMyPackages(PersonModel loggedIn, MongoDBService mongo)
@@ -677,6 +680,7 @@ internal class Program
         ShowParcelsOperation showParcels = new ShowParcelsOperation();
         showParcels.Notify += EventListener.OnUserOperation;
         showParcels.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "");
+        Console.ReadKey();
     }
 
     public static void AddPackage(MongoDBService mongo)
@@ -696,6 +700,7 @@ internal class Program
         addParcel.Notify += EventListener.OnParcelOperation;
         ParcelModel addedParcel = new ParcelModel(GetInputString("Enter parcel name:"), loggedIn);
         addParcel.Operation(mongo, addedParcel, loggedIn, new MongoDBOperationEventArgs());
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void DeletePackage(PersonModel loggedIn, MongoDBService mongo)
@@ -765,6 +770,9 @@ internal class Program
         DatabaseSearch.mongo = mongo;
         
         //Tests.TestAddUserOperation(mongo);
+
+        AddUserOperation add = new AddUserOperation();
+        add.Notify += EventListener.OnUserOperation;
         
         PersonModel loggedIn = LogIn();
         ChooseMenu(loggedIn, mongo);
