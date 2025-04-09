@@ -17,28 +17,41 @@ public class UpdateParcelOperation : ParcelBase
         {
             if (userParcel.Key == parcel.ParcelName)
             {
-                if(parcel.Recipient.Username == "")
-                {
-                    parcel.Recipient = userParcel.Value.Recipient;
-                }
                 e.Success = true;
                 break;
             }
         }
-
-        if(DatabaseSearch.FindUsers().ContainsKey(parcel.Recipient.Username) == false || DatabaseSearch.FindUsers().ContainsKey(parcel.Sender.Username) == false)
+        
+        
+        if(DatabaseSearch.FindUsers().ContainsKey(parcel.Sender.Username) == false)
         {
             e.Success = false;
-            e.Message = $"Recipient or  sender does not exist";
+            e.Message = $"{parcel.Sender.Username} does not exist";
         }
         else if (e.Success)
         {
-            var filter = Builders<ParcelModel>.Filter.Eq(r => r.Id, parcel.Id);
-            var update = Builders<ParcelModel>.Update
-                .Set(r => r.Sender, parcel.Sender)
-                .Set(r => r.Status, parcel.Status)
-                .Set(r => r.Recipient, parcel.Recipient);
-            mongo.collectionParcels.UpdateOne(filter, update);
+           
+            
+            var databaseUsers = DatabaseSearch.FindUsers();
+            foreach (var databaseUser in databaseUsers)
+            {
+                if (parcel.Sender.Username == databaseUser.Value.Username)
+                {
+                    if (databaseUser.Value.Roles.Contains(Role.InpostEmployee))
+                    {
+                        var filter = Builders<ParcelModel>.Filter.Eq(r => r.ParcelName, parcel.ParcelName);
+                        var update = Builders<ParcelModel>.Update
+                            .Set(r => r.Sender, databaseUser.Value)
+                            .Set(r => r.Status, parcel.Status);
+                        mongo.collectionParcels.UpdateOne(filter, update);
+                    }
+                    else
+                    {
+                        e.Success = false;
+                        e.Message = $"{parcel.Sender.Username} does not have permission to deliver packages";
+                    }
+                }
+            }
         }
         else
         {

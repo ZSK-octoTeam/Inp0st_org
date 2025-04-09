@@ -28,16 +28,22 @@ public class EventListener : LogManager
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Operation '{e.Operation}' completed for user: {user}, with success.");
             Console.ResetColor();
-            Console.WriteLine(e.Message);
+            if (e.Message != "")
+            {
+                Console.WriteLine(e.Message);
+            }
         }
         else
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Operation '{e.Operation}' completed for user: {user}, with failure.");
             Console.ResetColor();
-            Console.WriteLine(e.Message);
+            if (e.Message != "")
+            {
+                Console.WriteLine(e.Message);
+            }
         }
-        //LogToFile(e);
+        LogToFile(e);
     }
 
     public static void OnParcelOperation(object sender, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
@@ -48,15 +54,21 @@ public class EventListener : LogManager
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Operation '{e.Operation}' completed for parcel: {parcel.ParcelName}, with status success.");
             Console.ResetColor();
-            Console.WriteLine(e.Message);
+            if (e.Message != "")
+            {
+                Console.WriteLine(e.Message);
+            }
         }
         else
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Operation '{e.Operation}' completed for parcel: {parcel.ParcelName}, with status failure.");
             Console.ResetColor();
-            Console.WriteLine(e.Message);
+            if (e.Message != "")
+            {
+                Console.WriteLine(e.Message);
+            }
         }
-        //LogToFile(e);
+        LogToFile(e);
     }
 }

@@ -27,8 +27,24 @@ public class AddParcelOperation : ParcelBase
         }
         else if (e.Success)
         {
-            mongo.collectionParcels.InsertOne(parcel);
-            e.Success = true;
+            var databaseUsers = DatabaseSearch.FindUsers();
+            foreach (var databaseUser in databaseUsers)
+            {
+                if (parcel.Recipient.Username == databaseUser.Value.Username)
+                {
+                    if (databaseUser.Value.Roles.Contains(Role.InpostClient))
+                    {
+                        mongo.collectionParcels.InsertOne(parcel);
+                        e.Success = true;
+                    }
+                    else
+                    {
+                        e.Success = false;
+                        e.Message = $"User: {databaseUser.Value.Username} does hot have a permission to receive parcel";
+                    }
+                }
+            }
+            
         }
         else
         {

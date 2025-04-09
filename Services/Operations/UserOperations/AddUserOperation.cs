@@ -31,12 +31,12 @@ public class AddUserOperation : UserBase
             }
             else
             {
-                //naprawic bo mozna dodac 2 takie same role
                 users[person.Username].Roles.Add(Enum.Parse<Role>(role));
                 var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
                 var update = Builders<PersonModel>.Update.Set(r => r.Roles, users[person.Username].Roles);
                 mongo.collectionUsers.UpdateOne(filter, update);
                 e.Success = true;
+                e.Message = $"Role: {role} added to user {person.Username}";
             }
         }
 

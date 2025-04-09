@@ -4,7 +4,6 @@ using Inpost_org.Services.Operations.UserOperations;
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Services.Operations;
 using Inpost_org.Services;
-using Inpost_org.Tests;
 using Inpost_org.Users.Deliveries;
 using Inpost_org.Users;
 using MongoDB.Driver;
@@ -535,9 +534,27 @@ internal class Program
         ShowHeader("=== ADD CLIENT ===");
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
-        PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetPassword("Enter password:"));
-        Console.WriteLine();
-        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostClient");
+        
+        bool roleAdded = false;
+        string username = GetInputString("Enter username:");
+        PersonModel addedUser = new PersonModel(username, "");
+        
+        foreach (var databaseUser in DatabaseSearch.FindUsers())
+        {
+            if (username == databaseUser.Key && !databaseUser.Value.Roles.Contains(Role.InpostClient))
+            {
+                addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostClient");
+                roleAdded = true;
+                break;
+            }
+        }
+
+        if (!roleAdded)
+        {
+            addedUser.Password = GetPassword("Enter password:");
+            addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostClient");
+        }
+        
         System.Threading.Thread.Sleep(3500);
     }
 
@@ -575,14 +592,35 @@ internal class Program
         ShowUsersOperation showUsers = new ShowUsersOperation();
         showUsers.Notify += EventListener.OnUserOperation;
         showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "InpostEmployee");
+        Console.ReadKey();
     }
 
     public static void AddDeliverer(MongoDBService mongo){
         ShowHeader("=== ADD DELIVERER ===");
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
-        PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
-        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostEmployee");
+        
+        bool roleAdded = false;
+        string username = GetInputString("Enter username:");
+        PersonModel addedUser = new PersonModel(username, "");
+        
+        foreach (var databaseUser in DatabaseSearch.FindUsers())
+        {
+            if (username == databaseUser.Key && !databaseUser.Value.Roles.Contains(Role.InpostEmployee))
+            {
+                addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostEmployee");
+                roleAdded = true;
+                break;
+            }
+        }
+
+        if (!roleAdded)
+        {
+            addedUser.Password = GetPassword("Enter password:");
+            addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "InpostEmployee");
+        }
+        
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void DeleteDeliverer(MongoDBService mongo){
@@ -591,6 +629,7 @@ internal class Program
         deleteUser.Notify += EventListener.OnUserOperation;
         PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
         deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs(), "InpostEmployee");
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void UpdateDeliverer(MongoDBService mongo)
@@ -598,8 +637,9 @@ internal class Program
         ShowHeader("=== UPDATE DELIVERER ===");
         UpdateUserOperation updateDeliverer = new UpdateUserOperation();
         updateDeliverer.Notify += EventListener.OnUserOperation;
-        PersonModel updatedDeliverer = new PersonModel(GetInputString("Enter username: "), GetInputString("Enter new password: "));
+        PersonModel updatedDeliverer = new PersonModel(GetInputString("Enter username: "), GetPassword("Enter new password: "));
         updateDeliverer.Operation(mongo, updatedDeliverer, new MongoDBOperationEventArgs(), "InpostEmployee");
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void SearchDeliverer(MongoDBService mongo)
@@ -609,6 +649,7 @@ internal class Program
         showDeliverer.Notify += EventListener.OnUserOperation;
         PersonModel searchedDeliverer = new PersonModel(GetInputString("Enter username: "), "");
         showDeliverer.Operation(mongo, searchedDeliverer, new MongoDBOperationEventArgs(), "InpostEmployee");
+        Console.ReadKey();
     }
 
     public static void ShowUsers(PersonModel loggedIn, MongoDBService mongo)
@@ -617,6 +658,7 @@ internal class Program
         ShowUsersOperation showUsers = new ShowUsersOperation();
         showUsers.Notify += EventListener.OnUserOperation;
         showUsers.Operation(mongo, loggedIn, new MongoDBOperationEventArgs(), "");
+        Console.ReadKey();
     }
 
     public static void AddUser(MongoDBService mongo)
@@ -624,7 +666,11 @@ internal class Program
         ShowHeader("=== ADD USER ===");
         AddUserOperation addUser = new AddUserOperation();
         addUser.Notify += EventListener.OnUserOperation;
-        PersonModel addedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter password:"));
+        
+        bool roleAdded = false;
+        string username = GetInputString("Enter username:");
+        PersonModel addedUser = new PersonModel(username, "");
+        
         Role r;
         while(!Enum.TryParse(GetInputString("Enter role:"), out r))
         {
@@ -633,9 +679,24 @@ internal class Program
             Console.WriteLine("-InpostClient");
             Console.WriteLine("-InpostEmployee");
         }
-        addedUser.Roles.Add(r);
-        addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), "");
-        System.Threading.Thread.Sleep(2500);
+        
+        foreach (var databaseUser in DatabaseSearch.FindUsers())
+        {
+            if (username == databaseUser.Key && !databaseUser.Value.Roles.Contains(r))
+            {
+                addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), r.ToString());
+                roleAdded = true;
+                break;
+            }
+        }
+
+        if (!roleAdded)
+        {
+            addedUser.Password = GetPassword("Enter password:");
+            addUser.Operation(mongo, addedUser, new MongoDBOperationEventArgs(), r.ToString());
+        }
+        
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void DeleteUser(MongoDBService mongo)
@@ -645,6 +706,7 @@ internal class Program
         deleteUser.Notify += EventListener.OnUserOperation;
         PersonModel deletedUser = new PersonModel(GetInputString("Enter username:"), "");
         deleteUser.Operation(mongo, deletedUser, new MongoDBOperationEventArgs(), "");
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void UpdateUser(MongoDBService mongo)
@@ -652,8 +714,9 @@ internal class Program
         ShowHeader("=== UPDATE USER ===");
         UpdateUserOperation updateUser = new UpdateUserOperation();
         updateUser.Notify += EventListener.OnUserOperation;
-        PersonModel updatedUser = new PersonModel(GetInputString("Enter username:"), GetInputString("Enter new password:"));
+        PersonModel updatedUser = new PersonModel(GetInputString("Enter username:"), GetPassword("Enter new password:"));
         updateUser.Operation(mongo, updatedUser, new MongoDBOperationEventArgs(), "");
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void SearchUser(MongoDBService mongo)
@@ -663,6 +726,7 @@ internal class Program
         showUser.Notify += EventListener.OnUserOperation;
         PersonModel searchedUser = new PersonModel(GetInputString("Enter username: "), "");
         showUser.Operation(mongo, searchedUser, new MongoDBOperationEventArgs(), "");
+        Console.ReadKey();
     }
 
     public static void ShowPackages(PersonModel loggedIn, MongoDBService mongo)
@@ -688,9 +752,10 @@ internal class Program
         ShowHeader("=== ADD PACKAGE ===");
         AddParcelOperation addParcel = new AddParcelOperation();
         addParcel.Notify += EventListener.OnParcelOperation;
-        PersonModel personModel = new PersonModel(GetInputString("Enter sender username:"), "");
+        PersonModel personModel = new PersonModel(GetInputString("Enter recipient username:"), "");
         ParcelModel addedParcel = new ParcelModel(GetInputString("Enter parcel name:"), personModel);
         addParcel.Operation(mongo, addedParcel, personModel ,new MongoDBOperationEventArgs());
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void OrderPackage(PersonModel loggedIn, MongoDBService mongo)
@@ -710,6 +775,7 @@ internal class Program
         deleteParcel.Notify += EventListener.OnParcelOperation;
         ParcelModel deletedParcel = new ParcelModel(GetInputString("Enter parcel name:"), loggedIn);
         deleteParcel.Operation(mongo, deletedParcel, loggedIn, new MongoDBOperationEventArgs());
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void UpdatePackage(PersonModel loggedIn, MongoDBService mongo)
@@ -717,7 +783,7 @@ internal class Program
         ShowHeader("=== UPDATE PACKAGE ===");
         UpdateParcelOperation updateParcel = new UpdateParcelOperation();
         updateParcel.Notify += EventListener.OnParcelOperation;
-        ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel(GetInputString("Enter new recipient username:"), ""));
+        ParcelModel updatedParcel = new ParcelModel(GetInputString("Enter parcel name:"), null);
         PersonModel delivererModel = new PersonModel(GetInputString("Enter new deliverer username:"), "");
         updatedParcel.ChangeSender(delivererModel);
         ParcelStatus s;
@@ -730,6 +796,7 @@ internal class Program
         }
         updatedParcel.ChangeStatus(s);
         updateParcel.Operation(mongo, updatedParcel, loggedIn, new MongoDBOperationEventArgs());
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void PickUpPackage(PersonModel loggedIn, MongoDBService mongo)
@@ -741,6 +808,7 @@ internal class Program
         updatedParcel.ChangeStatus(ParcelStatus.InTransport);
         updatedParcel.ChangeSender(loggedIn);
         updateParcel.Operation(mongo, updatedParcel, loggedIn, new MongoDBOperationEventArgs());
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void DeliverPackage(PersonModel loggedIn, MongoDBService mongo)
@@ -752,6 +820,7 @@ internal class Program
         updatedParcel.ChangeStatus(ParcelStatus.Delivered);
         updatedParcel.ChangeSender(loggedIn);
         updateParcel.Operation(mongo, updatedParcel, loggedIn, new MongoDBOperationEventArgs());
+        System.Threading.Thread.Sleep(3500);
     }
 
     public static void SearchPackage(PersonModel loggedIn, MongoDBService mongo)
@@ -761,19 +830,16 @@ internal class Program
         showParcel.Notify += EventListener.OnParcelOperation;
         ParcelModel searchedParcel = new ParcelModel(GetInputString("Enter parcel name:"), new PersonModel("", ""));
         showParcel.Operation(mongo, searchedParcel, loggedIn, new MongoDBOperationEventArgs());
+        Console.ReadKey();
     }
     public static void Main(string[] args)
     {
-        // Database
+        // Database connection
         MongoDBService mongo = new MongoDBService();
         mongo.Connect();
         DatabaseSearch.mongo = mongo;
         
-        //Tests.TestAddUserOperation(mongo);
-
-        AddUserOperation add = new AddUserOperation();
-        add.Notify += EventListener.OnUserOperation;
-        
+        // Log in site and menu
         PersonModel loggedIn = LogIn();
         ChooseMenu(loggedIn, mongo);
     }

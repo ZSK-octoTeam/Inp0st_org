@@ -14,16 +14,16 @@ public class ShowUsersOperation : UserBase
             string wynik = string.Join(", ", user.Value.Roles.Select(e => e.ToString()));
             if (wynik.Contains(role))
             {
-                e.Message += $"- {user.Key} - roles: \n";
+                e.Message += $"\n- {user.Key} - roles: \n";
                 if (user.Value.Roles.Count == 0)
                 {
-                    e.Message += $"- 'none'\n";
+                    e.Message += $"'none'\n";
                 }
                 else
                 {
                     foreach (var r in user.Value.Roles)
                     {
-                        e.Message += $"- '{r}'\n";
+                        e.Message += $"\t'{r}'\n";
                     }
                 }
             }

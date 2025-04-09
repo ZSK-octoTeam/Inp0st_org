@@ -30,12 +30,12 @@ public class ShowUserOperation : UserBase
                 var rbac = new RBAC();
 
                 e.Operation = "ShowUser";
-                e.Message += $"Username: {person.Username}\n";
+                e.Message += $"\nUsername: {person.Username}\n";
                 e.Message += "Roles: \n";
 
                 foreach (var r in person.Roles)
                 {
-                    e.Message += $"-{r}\n";
+                    e.Message += $"\t-{r}\n";
                 }
 
                 e.Message += "\nHas permission to: \n";
@@ -43,7 +43,7 @@ public class ShowUserOperation : UserBase
                 {
                     if (rbac.HasPermission(person, (Permission)permission))
                     {
-                        e.Message += $"-{permission}\n";
+                        e.Message += $"\t-{permission}\n";
                     }
                 }
             }
