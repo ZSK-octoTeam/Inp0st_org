@@ -13,7 +13,7 @@ public class AddParcelOperation : ParcelBase
         e.Success = true;
         foreach (var userParcel in DatabaseSearch.FindParcels())
         {
-            if (userParcel.Key == parcel.ParcelName && userParcel.Value.Recipient.Username == person.Username)
+            if (userParcel.Key == parcel.ParcelName)
             {
                 e.Success = false;
                 break;
@@ -27,11 +27,28 @@ public class AddParcelOperation : ParcelBase
         }
         else if (e.Success)
         {
-            mongo.collectionParcels.InsertOne(parcel);
+            var databaseUsers = DatabaseSearch.FindUsers();
+            foreach (var databaseUser in databaseUsers)
+            {
+                if (parcel.Recipient.Username == databaseUser.Value.Username)
+                {
+                    if (databaseUser.Value.Roles.Contains(Role.InpostClient))
+                    {
+                        mongo.collectionParcels.InsertOne(parcel);
+                        e.Success = true;
+                    }
+                    else
+                    {
+                        e.Success = false;
+                        e.Message = $"User: {databaseUser.Value.Username} does hot have a permission to receive parcel";
+                    }
+                }
+            }
+            
         }
         else
         {
-            e.Message = $"User: {person.Username} already has a parcel named: {parcel.ParcelName}";
+            e.Message = $"There is already a package named: {parcel.ParcelName}";
         }
 
         OnNotify(parcel, person, e);

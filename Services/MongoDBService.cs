@@ -44,7 +44,6 @@ public class MongoDBService : IMongoDBService
             DotEnv.Load();
             DatabaseUser = Environment.GetEnvironmentVariable("DATABASE_USER");
             DatabasePassword = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
-            Console.WriteLine($"Database user '{DatabaseUser}' and Password '{DatabasePassword}'");
             _connectionString = $"mongodb+srv://{DatabaseUser}:{DatabasePassword}@datacluster.kcry9.mongodb.net/?retryWrites=true&w=majority&appName=dataCluster";
         }
         catch (Exception ex)
@@ -67,12 +66,17 @@ public class MongoDBService : IMongoDBService
             collectionUsers = _database.GetCollection<PersonModel>(CollectionNameUsers);
             collectionParcels = _database.GetCollection<ParcelModel>(CollectionNameParcels);
 
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Pinging your deployment...");
             var result = _client.GetDatabase("admin").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Pinged your deployment. You successfully connected to MongoDB! {result}");
+            Console.ResetColor();
+            System.Threading.Thread.Sleep(2500);
         }
         catch (Exception ex)
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Wrong database user credentials !!!");
             Console.WriteLine($"Could not connect to MongoDB: the connection string is not valid.");
             System.Environment.Exit(-1);

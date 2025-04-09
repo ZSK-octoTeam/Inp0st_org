@@ -12,9 +12,15 @@ public class ShowUserOperation : UserBase
         e.Operation = "Show user";
         e.Success = false;
         var users = DatabaseSearch.FindUsers();
-        string wynik = string.Join(", ", users[person.Username].Roles.Select(e => e.ToString()));
-        if (users.ContainsKey(person.Username))
+        if (!users.ContainsKey(person.Username))
         {
+            e.Success = false;
+            e.Message = "User does not exist.";
+        }
+        else
+        {
+            string wynik = string.Join(", ", users[person.Username].Roles.Select(e => e.ToString()));
+            
             if (wynik.Contains(role))
             {
                 e.Success = true;
@@ -24,12 +30,12 @@ public class ShowUserOperation : UserBase
                 var rbac = new RBAC();
 
                 e.Operation = "ShowUser";
-                e.Message += $"Username: {person.Username}\n";
+                e.Message += $"\nUsername: {person.Username}\n";
                 e.Message += "Roles: \n";
 
                 foreach (var r in person.Roles)
                 {
-                    e.Message += $"-{r}\n";
+                    e.Message += $"\t-{r}\n";
                 }
 
                 e.Message += "\nHas permission to: \n";
@@ -37,7 +43,7 @@ public class ShowUserOperation : UserBase
                 {
                     if (rbac.HasPermission(person, (Permission)permission))
                     {
-                        e.Message += $"-{permission}\n";
+                        e.Message += $"\t-{permission}\n";
                     }
                 }
             }
@@ -46,11 +52,6 @@ public class ShowUserOperation : UserBase
                 e.Success = false;
                 e.Message = $"User is not a {role}.";
             }
-        }
-        else
-        {
-            e.Success = false;
-            e.Message = "User does not exist.";
         }
 
         OnNotify(person, e);
