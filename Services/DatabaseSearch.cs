@@ -10,44 +10,44 @@ namespace Inpost_org.Services;
 public class DatabaseSearch
 {
     public static MongoDBService mongo;
-     
+
     /// <summary>
-    /// Sorts users by their roles and the returns them in a dictionary
+    /// Finds every user that is in the database and returns them into a dictionary
+    /// with username for key and PersonModel for value.
     /// </summary>
-    /// <param name="person"></param>
-    /// <returns>dictonary<Role, PersonModel></returns>
+    /// <returns>dictionary<string, PersonModel></returns>
     public static Dictionary<string, PersonModel> FindUsers()
     {
         Dictionary<string, PersonModel> users = new Dictionary<string, PersonModel>();
-            foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-            {
-                users.Add(databasePerson.Username, databasePerson);
-            }
-            
-            return users;
+        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
+        {
+            users.Add(databasePerson.Username, databasePerson);
+        }
+
+        return users;
     }
-    
+
     /// <summary>
-    /// Returns all parcels that are connected with the user
+    /// Finds every parcel that is in the database and returns them into a dictionary
+    /// with parcel name for key and ParcelModel for value.
     /// </summary>
-    /// <param name="person"></param>
-    /// <returns>List of Parcel(ParcelModel)</returns>
+    /// <returns>Dictionary<string, ParcelModel></returns>
     public static Dictionary<string, ParcelModel> FindParcels()
     {
-        Dictionary<string ,ParcelModel> parcels = new Dictionary<string, ParcelModel>();
+        Dictionary<string, ParcelModel> parcels = new Dictionary<string, ParcelModel>();
         foreach (var databaseParcel in mongo.collectionParcels.Find(new BsonDocument()).ToList())
         {
-            parcels.Add(databaseParcel.ParcelName, databaseParcel);    
+            parcels.Add(databaseParcel.ParcelName, databaseParcel);
         }
-        
+
         return parcels;
     }
 
     /// <summary>
-    /// function for hashing passwords
+    /// Function for hashing passwords with SHA-256
     /// </summary>
     /// <param name="password"></param>
-    /// <returns>hashed password</returns>
+    /// <returns>string hashedPassword</returns>
     public static string HashPassword(string password)
     {
         using (var sha256 = SHA256.Create())

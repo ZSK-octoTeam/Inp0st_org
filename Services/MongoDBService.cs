@@ -13,7 +13,7 @@ public interface IMongoDBService
 }
 
 /// <summary>
-/// Service class for MongoDB operations.
+/// Service class for MongoDB connection.
 /// </summary>
 public class MongoDBService : IMongoDBService
 {
@@ -30,10 +30,9 @@ public class MongoDBService : IMongoDBService
     public string DatabasePassword { get; private set; }
     
     /// <summary>
-    /// Initializes a new instance of the MongoDBService class.
+    /// Initializes a new instance of the MongoDBService class, it creates new connection string
+    /// based on the Environmental variables from the .env file.
     /// </summary>
-    /// <param name="databaseUser">Database user name.</param>
-    /// <param name="databasePassword">Database user password.</param>
     public MongoDBService()
     {
         DatabaseName = "Inpost";
@@ -54,9 +53,9 @@ public class MongoDBService : IMongoDBService
     }
     
     ///<summary>
-    /// Connects to the MongoDB database.
+    /// Connects to the MongoDB database and pings the 'admin' collection, it stops the program if
+    /// the Environmental variables are not valid.
     /// </summary>
-    /// <returns>True if connection is successful, otherwise false.</returns>
     public void Connect()
     {
         try
