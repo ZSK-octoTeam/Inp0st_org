@@ -1,3 +1,4 @@
+using Inpost_org.Enums;
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Users.Deliveries;
 using Inpost_org.Users;
@@ -5,8 +6,18 @@ using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.ParcelOperations;
 
+/// <summary>
+/// Class responsible for updating the details of a parcel in the MongoDB database.
+/// </summary>
 public class UpdateParcelOperation : ParcelBase
 {
+    /// <summary>
+    /// Executes the operation of updating the details of a parcel, such as its sender and status.
+    /// </summary>
+    /// <param name="mongo">The MongoDB service object.</param>
+    /// <param name="parcel">The parcel model representing the parcel to be updated.</param>
+    /// <param name="person">The person model representing the user performing the operation.</param>
+    /// <param name="e">The event arguments for the MongoDB operation.</param>
     public override void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         

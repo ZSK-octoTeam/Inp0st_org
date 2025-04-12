@@ -1,3 +1,4 @@
+using Inpost_org.Enums;
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Services.Operations.ParcelOperations;
 using Inpost_org.Users;
@@ -6,21 +7,18 @@ using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
+/// <summary>
+/// Class responsible for deleting users from the MongoDB database.
+/// </summary>
 public class DeleteUserOperation : UserBase
 {
-    private void delPackages(MongoDBService mongo,PersonModel person)
-    {
-        
-        
-        foreach (var databaseParcel in DatabaseSearch.FindParcels())
-        {
-            if (databaseParcel.Value.Recipient.Username == person.Username)
-            {
-                   
-            }
-        }
-    }
-    
+    /// <summary>
+    /// Executes the operation of deleting a user from the database.
+    /// </summary>
+    /// <param name="mongo">The MongoDB service object.</param>
+    /// <param name="person">The person model representing the user to be deleted.</param>
+    /// <param name="e">The event arguments for the MongoDB operation.</param>
+    /// <param name="role">The role to be checked or removed from the user.</param>
     public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e, string role)
     {
         e.Operation = "DeleteUser";

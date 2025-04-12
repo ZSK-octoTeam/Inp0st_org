@@ -1,18 +1,18 @@
+using Inpost_org.Enums;
 using Inpost_org.Users.Deliveries;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Inpost_org.Users;
 
-public enum Role
-{
-    Administrator,
-    InpostEmployee,
-    InpostClient
-}
-
+/// <summary>
+/// Represents a user in the system, including their credentials and roles.
+/// </summary>
 public class PersonModel
 {
+    /// <summary>
+    /// The unique identifier for the user, stored as an ObjectId in MongoDB.
+    /// </summary>
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
@@ -20,6 +20,11 @@ public class PersonModel
     public string Password { get; set; }
     public List<Role> Roles { get; set; }
     
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PersonModel"/> class with the specified username and password.
+    /// </summary>
+    /// <param name="username">The username of the user.</param>
+    /// <param name="password">The password of the user.</param>
     public PersonModel(string username, string password)
     {
         Username = username;

@@ -1,3 +1,4 @@
+using Inpost_org.Enums;
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Users;
 using MongoDB.Driver;
@@ -5,8 +6,18 @@ using MongoDB.Bson;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
+/// <summary>
+/// Class responsible for displaying user details and their permissions.
+/// </summary>
 public class ShowUserOperation : UserBase
 {
+    /// <summary>
+    /// Executes the operation of displaying user details and their permissions.
+    /// </summary>
+    /// <param name="mongo">The MongoDB service object.</param>
+    /// <param name="person">The person model representing the user to be displayed.</param>
+    /// <param name="e">The event arguments for the MongoDB operation.</param>
+    /// <param name="role">The role to be checked for the user.</param>
     public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e, string role)
     {
         e.Operation = "Show user";

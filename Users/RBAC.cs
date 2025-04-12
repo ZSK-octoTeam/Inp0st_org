@@ -1,12 +1,6 @@
-namespace Inpost_org.Users;
+using Inpost_org.Enums;
 
-public enum Permission
-{
-    Read,
-    Write,
-    Edit,
-    ManageUsers
-}
+namespace Inpost_org.Users;
 
 public class RBAC
 {
@@ -19,9 +13,9 @@ public class RBAC
     {
         _rolePermissions = new Dictionary<Role, List<Permission>>
         {
-            { Role.Administrator, new List<Permission>{ Permission.Read, Permission.Write, Permission.Edit, Permission.ManageUsers }},
-            { Role.InpostEmployee, new List<Permission>{ Permission.Read, Permission.Write}},
-            { Role.InpostClient, new List<Permission>{ Permission.Read, Permission.Edit } }
+            { Role.Administrator, new List<Permission>{ Permission.DeletePackages, Permission.OrderPackages, Permission.DeliverPackages, Permission.ManageUsers, Permission.UpdatePackages }},
+            { Role.InpostEmployee, new List<Permission>{ Permission.DeletePackages, Permission.UpdatePackages}},
+            { Role.InpostClient, new List<Permission>{ Permission.DeletePackages, Permission.OrderPackages } }
         };
     }
     

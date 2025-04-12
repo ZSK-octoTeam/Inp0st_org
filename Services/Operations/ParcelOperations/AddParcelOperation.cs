@@ -1,3 +1,4 @@
+using Inpost_org.Enums;
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Users;
 using Inpost_org.Users.Deliveries;
@@ -5,8 +6,18 @@ using MongoDB.Driver.Linq;
 
 namespace Inpost_org.Services.Operations.ParcelOperations;
 
+/// <summary>
+/// Class responsible for adding a new parcel to the MongoDB database.
+/// </summary>
 public class AddParcelOperation : ParcelBase
 {
+    /// <summary>
+    /// Executes the operation of adding a new parcel to the database.
+    /// </summary>
+    /// <param name="mongo">The MongoDB service object.</param>
+    /// <param name="parcel">The parcel model representing the parcel to be added.</param>
+    /// <param name="person">The person model representing the user performing the operation.</param>
+    /// <param name="e">The event arguments for the MongoDB operation.</param>
     public override void Operation(MongoDBService mongo, ParcelModel parcel, PersonModel person, MongoDBOperationEventArgs e)
     {
         e.Operation = "AddParcel";

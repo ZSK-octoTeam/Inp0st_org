@@ -108,3 +108,57 @@ Event: DeleteUser, completed with status: failure on date: 12.04.2025 19:35:36
 
 Event: UpdateUsers, completed with status: failure on date: 12.04.2025 19:35:44
 
+Event: AddUser, completed with status: success on date: 12.04.2025 20:07:14
+
+Event: Show users, completed with status: success on date: 12.04.2025 20:07:18
+
+Event: DeleteUser, completed with status: success on date: 12.04.2025 20:07:26
+
+Event: Show users, completed with status: success on date: 12.04.2025 20:07:30
+
+Event: DeleteUser, completed with status: failure on date: 12.04.2025 20:07:37
+
+Event: DeleteUser, completed with status: success on date: 12.04.2025 20:07:44
+
+Event: AddUser, completed with status: success on date: 12.04.2025 20:07:50
+
+Event: Show users, completed with status: success on date: 12.04.2025 20:07:54
+
+Event: UpdateUser, completed with status: failure on date: 12.04.2025 20:08:00
+
+Event: Show user, completed with status: failure on date: 12.04.2025 20:08:06
+
+Event: ShowUser, completed with status: success on date: 12.04.2025 20:08:13
+
+Event: AddUser, completed with status: success on date: 12.04.2025 20:08:29
+
+Event: Show users, completed with status: success on date: 12.04.2025 20:08:45
+
+Event: DeleteUser, completed with status: success on date: 12.04.2025 20:09:00
+
+Event: DeleteUser, completed with status: success on date: 12.04.2025 20:09:09
+
+Event: DeleteUser, completed with status: success on date: 12.04.2025 20:09:16
+
+Event: AddUser, completed with status: success on date: 12.04.2025 20:09:25
+
+Event: AddUser, completed with status: success on date: 12.04.2025 20:09:34
+
+Event: Show parcels, completed with status: success on date: 12.04.2025 20:10:05
+
+Event: UpdateParcel, completed with status: failure on date: 12.04.2025 20:10:22
+
+Event: Show parcels, completed with status: success on date: 12.04.2025 20:10:28
+
+Event: UpdateParcel, completed with status: failure on date: 12.04.2025 20:10:43
+
+Event: ShowParcel, completed with status: success on date: 12.04.2025 20:10:50
+
+Event: Show users, completed with status: success on date: 12.04.2025 20:10:57
+
+Event: Show user, completed with status: failure on date: 12.04.2025 20:11:05
+
+Event: ShowUser, completed with status: success on date: 12.04.2025 20:11:09
+
+Event: ShowUser, completed with status: success on date: 12.04.2025 20:11:13
+

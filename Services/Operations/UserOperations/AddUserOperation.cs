@@ -1,3 +1,4 @@
+using Inpost_org.Enums;
 using Inpost_org.Services.NotificationMethods;
 using Inpost_org.Users;
 using MongoDB.Bson;
@@ -5,8 +6,18 @@ using MongoDB.Driver;
 
 namespace Inpost_org.Services.Operations.UserOperations;
 
+/// <summary>
+/// Class responsible for adding users to the MongoDB database.
+/// </summary>
 public class AddUserOperation : UserBase
 {
+    /// <summary>
+    /// Executes the operation of adding a user to the database.
+    /// </summary>
+    /// <param name="mongo">The MongoDB service object.</param>
+    /// <param name="person">The person model representing the user to be added.</param>
+    /// <param name="e">The event arguments for the MongoDB operation.</param>
+    /// <param name="role">The role to be assigned to the user.</param>
     public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e, string role)
     {
         e.Operation = "AddUser";
