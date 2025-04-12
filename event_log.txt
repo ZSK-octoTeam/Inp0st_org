@@ -82,3 +82,29 @@ Event: AddUser, completed with status: success on date: 9.04.2025 17:25:27
 
 Event: AddUser, completed with status: failure on date: 9.04.2025 17:25:38
 
+Event: AddUser, completed with status: success on date: 12.04.2025 19:30:57
+
+Event: AddUser, completed with status: failure on date: 12.04.2025 19:31:08
+
+Event: Show users, completed with status: success on date: 12.04.2025 19:31:13
+
+Event: DeleteUser, completed with status: success on date: 12.04.2025 19:31:20
+
+Event: DeleteUser, completed with status: failure on date: 12.04.2025 19:31:26
+
+Event: Show user, completed with status: failure on date: 12.04.2025 19:31:33
+
+Event: AddUser, completed with status: success on date: 12.04.2025 19:32:24
+
+Event: Show user, completed with status: failure on date: 12.04.2025 19:32:37
+
+Event: Show users, completed with status: success on date: 12.04.2025 19:32:52
+
+Event: DeleteUser, completed with status: failure on date: 12.04.2025 19:32:56
+
+Event: Show users, completed with status: success on date: 12.04.2025 19:35:32
+
+Event: DeleteUser, completed with status: failure on date: 12.04.2025 19:35:36
+
+Event: UpdateUsers, completed with status: failure on date: 12.04.2025 19:35:44
+
