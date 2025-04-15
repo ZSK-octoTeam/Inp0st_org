@@ -29,35 +29,7 @@ This is a console application for managing clients, deliverers, and packages usi
 
 4. **Run the application using .NET CLI:**
     ```sh
-    dotnet run --project Inp0st_org
-    ```
-
-### Running the Application with Docker (Build Locally)
-
-1. **Clone the repository from GitHub:**
-    ```sh
-    git clone https://github.com/ZSK-octoTeam/Inp0st_org.git
-    ```
-
-2. **Enter the project directory:**
-    ```sh
-    cd Inp0st_org
-    ```
-
-3. **Create a .env file in the root directory with the necessary environment variables:**
-    ```sh
-    DATABASE_USER=your_database_user
-    DATABASE_PASSWORD=your_database_password
-    ```
-
-4. **Build the Docker image:**
-    ```sh
-    docker build -t Inp0st_org_image .
-    ```
-
-5. **Run the Docker container:**
-    ```sh
-    docker run -it --name Inp0st_org_container --env-file .env Inp0st_org_image
+    dotnet run
     ```
 
 ### Running the Application with Docker (Prebuilt Image)
@@ -73,9 +45,9 @@ This is a console application for managing clients, deliverers, and packages usi
     DATABASE_PASSWORD=your_database_password
     ```
 
-3. **Run the Docker container:**
+3. **Run the Docker container(make sure you are in the same directory as the .env file):**
     ```sh
-    docker run -it --name Inp0st_org_container --env-file .env guc10/inp0st_org
+    docker run -it --rm --name Inp0st_org_container --env-file .env guc10/inp0st_org
     ```
 
 ## Usage

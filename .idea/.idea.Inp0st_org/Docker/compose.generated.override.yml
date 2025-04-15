@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  inp0st_org:
+    build:
+      context: "C:\\Users\\gusta\\source\\repos\\dotnet\\Inp0st_org"
+      dockerfile: "Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net9.0/Inp0st_org.dll"
+    environment:
+      DOTNET_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "inp0st_org:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\gusta\\source\\repos\\dotnet\\Inp0st_org:/app:rw"
+    - "C:\\Users\\gusta\\source\\repos\\dotnet\\Inp0st_org:/src:rw"
+    - "C:\\Users\\gusta\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
