@@ -18,38 +18,46 @@ public class UpdateUserOperation : UserBase
     /// <param name="role">The role used to filter or validate the users to be updated.</param>
     public override void Operation(MongoDBService mongo, PersonModel person, MongoDBOperationEventArgs e, string role)
     {
-        e.Operation = "UpdateUser";
+        // Set the operation type
+        e.Operation = "UpdateUsers";
+
+        // Retrieve the list of existing users
         var users = DatabaseSearch.FindUsers();
-        if (users.ContainsKey(person.Username))
+
+        // Initialize the operation as unsuccessful
+        e.Success = false;
+
+        // Iterate through all users in the database
+        foreach (var user in users)
         {
-            string wynik = string.Join(", ", users[person.Username].Roles.Select(e => e.ToString()));
-            if (!wynik.Contains(role))
+            // Check if the user has the specified role
+            if (user.Value.Roles.Any(r => r.ToString() == role))
             {
-                e.Success = false;
-                e.Message = $"User is not a {role}.";
-            }
-            else
-            {
-                if (DatabaseSearch.HashPassword(person.Password) == users[person.Username].Password)
+                // Check if the new password is different from the old one
+                if (DatabaseSearch.HashPassword(person.Password) == user.Value.Password)
                 {
-                    e.Success = false; 
-                    e.Message = "New password is the same as the old one.";
+                    e.Message += $"User {user.Key}: New password is the same as the old one.\n";
                 }
                 else
                 {
-                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, person.Username);
+                    // Update the user's password in the database
+                    var filter = Builders<PersonModel>.Filter.Eq(r => r.Username, user.Key);
                     var update = Builders<PersonModel>.Update.Set(r => r.Password, DatabaseSearch.HashPassword(person.Password));
                     mongo.collectionUsers.UpdateOne(filter, update);
+
+                    // Mark the operation as successful for this user
+                    e.Message += $"User {user.Key}: Password updated successfully.\n";
                     e.Success = true;
                 }
             }
+            else
+            {
+                // Log a message if the user does not have the specified role
+                e.Message += $"User {user.Key}: Does not have the role {role}.\n";
+            }
         }
-        else
-        {
-            e.Success = false;
-            e.Message = "User does not exist.";
-        }
-    
+
+        // Trigger the notification event for the operation
         OnNotify(person, e);
     }
 }

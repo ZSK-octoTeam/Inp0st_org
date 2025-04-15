@@ -23,7 +23,7 @@ public abstract class UserBase
     {
         Notify?.Invoke(this, person, e);
     }
-    
+
     /// <summary>
     /// Abstract method to perform a user-related operation.
     /// Must be implemented by derived classes.
@@ -44,7 +44,7 @@ public abstract class ParcelBase
     /// Event triggered to notify about parcel-related operations.
     /// </summary>
     public event MongoDBParcelOperationHandler Notify;
-    
+
     /// <summary>
     /// Invokes the Notify event with the provided parcel, user, and operation details.
     /// </summary>
@@ -55,7 +55,7 @@ public abstract class ParcelBase
     {
         Notify?.Invoke(this, parcel, person, e);
     }
-    
+
     /// <summary>
     /// Abstract method to perform a parcel-related operation.
     /// Must be implemented by derived classes.

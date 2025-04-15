@@ -13,7 +13,7 @@ public interface IMongoDBService
 }
 
 /// <summary>
-/// Service class for MongoDB operations.
+/// Service class for MongoDB connection.
 /// </summary>
 public class MongoDBService : IMongoDBService
 {

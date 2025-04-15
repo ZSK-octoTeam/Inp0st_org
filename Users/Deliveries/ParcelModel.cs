@@ -19,7 +19,7 @@ public class ParcelModel
     public PersonModel Sender { get; set; }
     public PersonModel Recipient { get; set; }
     public ParcelStatus Status { get; set; }
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ParcelModel"/> class with the specified name and recipient.
     /// </summary>
@@ -31,12 +31,20 @@ public class ParcelModel
         Recipient = recipient;
         Status = ParcelStatus.InWarehouse;
     }
-    
+
+    /// <summary>
+    /// Changes the status of the parcel.
+    /// </summary>
+    /// <param name="newStatus">The new status to be assigned to the parcel.</param>
     public void ChangeStatus(ParcelStatus newStatus)
     {
         Status = newStatus;
     }
 
+    /// <summary>
+    /// Changes the sender of the parcel.
+    /// </summary>
+    /// <param name="newSender">The new sender to be assigned to the parcel.</param>
     public void ChangeSender(PersonModel newSender)
     {
         Sender = newSender;

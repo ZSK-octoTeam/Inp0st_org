@@ -10,7 +10,7 @@ namespace Inpost_org.Services;
 public class DatabaseSearch
 {
     public static MongoDBService mongo;
-     
+
     /// <summary>
     /// Finds every user that is in the database and returns them into a dictionary
     /// with username for key and PersonModel for value.
@@ -19,14 +19,14 @@ public class DatabaseSearch
     public static Dictionary<string, PersonModel> FindUsers()
     {
         Dictionary<string, PersonModel> users = new Dictionary<string, PersonModel>();
-            foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
-            {
-                users.Add(databasePerson.Username, databasePerson);
-            }
-            
-            return users;
+        foreach (var databasePerson in mongo.collectionUsers.Find(new BsonDocument()).ToList())
+        {
+            users.Add(databasePerson.Username, databasePerson);
+        }
+
+        return users;
     }
-    
+
     /// <summary>
     /// Finds every parcel that is in the database and returns them into a dictionary
     /// with parcel name for key and ParcelModel for value.
@@ -34,12 +34,12 @@ public class DatabaseSearch
     /// <returns>Dictionary<string, ParcelModel></returns>
     public static Dictionary<string, ParcelModel> FindParcels()
     {
-        Dictionary<string ,ParcelModel> parcels = new Dictionary<string, ParcelModel>();
+        Dictionary<string, ParcelModel> parcels = new Dictionary<string, ParcelModel>();
         foreach (var databaseParcel in mongo.collectionParcels.Find(new BsonDocument()).ToList())
         {
-            parcels.Add(databaseParcel.ParcelName, databaseParcel);    
+            parcels.Add(databaseParcel.ParcelName, databaseParcel);
         }
-        
+
         return parcels;
     }
 

@@ -38,6 +38,7 @@ public class EventListener : LogManager
         string user = person == null ? "Admin" : person.Username;
         if (e.Success)
         {
+            // Display success message in green
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Operation '{e.Operation}' completed for user: {user}, with success.");
             Console.ResetColor();
@@ -48,6 +49,7 @@ public class EventListener : LogManager
         }
         else
         {
+            // Display failure message in red
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Operation '{e.Operation}' completed for user: {user}, with failure.");
             Console.ResetColor();
@@ -56,6 +58,8 @@ public class EventListener : LogManager
                 Console.WriteLine(e.Message);
             }
         }
+        
+        // Log the operation details to a file
         LogToFile(e);
     }
 
@@ -73,6 +77,7 @@ public class EventListener : LogManager
         string action = e.Success ? "success" : "failure";
         if (e.Success)
         {
+            //Display success message in green
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Operation '{e.Operation}' completed for parcel: {parcel.ParcelName}, with status success.");
             Console.ResetColor();
@@ -83,6 +88,7 @@ public class EventListener : LogManager
         }
         else
         {
+            //Display failure message in red
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Operation '{e.Operation}' completed for parcel: {parcel.ParcelName}, with status failure.");
             Console.ResetColor();
@@ -91,6 +97,8 @@ public class EventListener : LogManager
                 Console.WriteLine(e.Message);
             }
         }
+        
+        //Log the operation details to a file
         LogToFile(e);
     }
 }
