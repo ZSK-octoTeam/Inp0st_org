@@ -45,7 +45,7 @@ This is a console application for managing clients, deliverers, and packages usi
     DATABASE_PASSWORD=your_database_password
     ```
 
-3. **Run the Docker container(make sure you are in the same directory as the .env file):**
+3. **Run the Docker container (make sure you are in the same directory as the .env file):**
     ```sh
     docker run -it --rm --name Inp0st_org_container --env-file .env guc10/inp0st_org
     ```
